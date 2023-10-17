@@ -4,34 +4,32 @@ CXX = x86_64-w64-mingw32-g++
 CFLAGS = -Wall
 LDFLAGS = -I/home/cashcraf/raylib/src -L/home/cashcraf/raylib/src
 LIBS_LINUX = -lraylib -lGL -lpthread -ldl -lrt -lX11 -lm
-LIBS_WINDOWS = -lraylib -lopengl32 -lgdi32 -lwinmm -lpthread -O1
+LIBS_WINDOWS = -lraylib -lopengl32 -lgdi32 -lwinmm -lpthread
+OPT_FLAGS = -O1  # Adjust optimization level as needed
 
 # Source files
-SRC = $(wildcard *.cc)
+SRC = waffle.cc animation.cc camera.cc 
 
 # Output executables
 OUT_LINUX = waffle.exe
-OUT_WINDOWS = window.exe
+OUT_WINDOWS = windows.exe
 
-all: linux windows
+all: $(OUT_LINUX) $(OUT_WINDOWS)
+
+$(OUT_LINUX): $(SRC)
+	$(CC) -o $(OUT_LINUX) $^ $(LIBS_LINUX) $(OPT_FLAGS)
+
+$(OUT_WINDOWS): $(SRC)
+	$(CXX) -o $(OUT_WINDOWS) $^ $(CFLAGS) $(LDFLAGS) $(LIBS_WINDOWS) $(OPT_FLAGS)
+
+.PHONY: run clean
+
+run: $(OUT_LINUX)
+	./$(OUT_LINUX)
 
 linux: $(OUT_LINUX)
 
 windows: $(OUT_WINDOWS)
 
-$(OUT_LINUX): $(OBJ)
-	$(CC) -o $(OUT_LINUX) $^ $(LDFLAGS) $(LIBS_LINUX)
-
-$(OUT_WINDOWS): $(OBJ)
-	$(CXX) -o $(OUT_WINDOWS) $^ $(CFLAGS) $(LDFLAGS) $(LIBS_WINDOWS)
-
-%.o: %.cc
-	$(CXX) $(CFLAGS) $(LDFLAGS) -o $@ -c $<
-
-.PHONY: run clean
-
-run: linux
-	./$(OUT_LINUX)
-
 clean:
-	rm -f $(OUT_LINUX) $(OUT_WINDOWS) $(OBJ)
+	rm -f $(OUT_LINUX) $(OUT_WINDOWS)
