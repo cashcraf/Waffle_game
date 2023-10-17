@@ -47,6 +47,8 @@ int main(){
 
     // Textures and annimations
     Texture2D Waffle = LoadTexture("Waffle_Sprite_Sheet.png");
+    Texture2D background = LoadTexture("2D_courtSt.png");
+
     
     SpriteAnimation _animation;
     SpriteAnimation idleAnimation;
@@ -190,7 +192,9 @@ int main(){
         BeginDrawing();
         BeginMode2D(camera); // Set camera mode to follow the target
 
-        ClearBackground(DARKGRAY);
+        // background
+        ClearBackground(WHITE);
+        DrawTexture(background, 0, 0, WHITE);
         DrawText("move waffle with arrow keys", 10, 10, 20, WHITE);
 
         Rectangle dest = (Rectangle){wafflePos.x, wafflePos.y, waffleSize * scale, waffleSize * scale}; 
@@ -202,7 +206,8 @@ int main(){
         EndMode2D();
         EndDrawing();
     }
-   CloseWindow();
-   return 0;
+    UnloadTexture(background);
+    CloseWindow();
+    return 0;
 }
 
