@@ -8,7 +8,7 @@ LIBS_WINDOWS = -lraylib -lopengl32 -lgdi32 -lwinmm -lpthread
 OPT_FLAGS = -O1  # Adjust optimization level as needed
 
 # Source files
-SRC = waffle.cc animation.cc camera.cc 
+SRC = waffle.cc animation.cc camera.cc rat.cc main.cc
 
 # Output executables
 OUT_LINUX = waffle.exe
