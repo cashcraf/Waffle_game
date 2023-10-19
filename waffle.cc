@@ -2,7 +2,7 @@
 *  @file: Waffle.cc
 *  @author: cashcraf
 *  @date: 2023-10-18 
-*  @brief: 
+*  @brief: this is the def file for waffle.h
 */
  
 #include "raylib.h"
