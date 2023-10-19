@@ -1,4 +1,4 @@
-#include "animation.h"
+#include "Headers/animation.h"
 #include <stdlib.h>
 
 // to compile: cc -o waffle.exe waffle.cc animation.cc -lraylib -lGL -lpthread -ldl -lrt -lX11 -lm

@@ -1,6 +1,6 @@
 // Camera.cc
 #include "raylib.h"
-#include "camera.h"
+#include "Headers/camera.h"
 
 Camera2D InitiateCamera(Vector2 target, int screenWidth, int screenHeight) {
     Camera2D camera = {0};

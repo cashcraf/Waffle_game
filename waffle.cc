@@ -9,8 +9,8 @@
  // can now compile with make linux or make windows make clean to clear the executibles and make run to run on linux
 #include "raylib.h"
 #include <stdlib.h>
-#include "animation.h"
-#include "camera.h"
+#include "Headers/animation.h"
+#include "Headers/camera.h"
 
 // Memory is auto deallocated after program ends so the rectangles dont need to be deallocated
 // to compile: cc -o waffle.exe waffle.cc animation.cc camera.cc -lraylib -lGL -lpthread -ldl -lrt -lX11 -lm
@@ -31,6 +31,7 @@ int main(){
     bool isMoving = 0;
     bool isJumping = 0;
     bool isRight = 1;
+    bool isHissing = 0;
     bool isLeft = 0;
     float jumpStartTime;
     float jumpTime;
@@ -46,18 +47,20 @@ int main(){
     Camera2D camera = InitiateCamera((Vector2){wafflePos.x + waffleSize * scale / 2, wafflePos.y + waffleSize * scale / 2}, (float)screenWidth, (float)screenHeight);
 
     // Textures and annimations
-    Texture2D Waffle = LoadTexture("Waffle_Sprite_Sheet.png");
-    Texture2D background = LoadTexture("2D_courtSt.png");
+    Texture2D Waffle = LoadTexture("Images/Waffle_Sprite_Sheet.png");
+    Texture2D rat = LoadTexture("Images/enemy_rat.png");
+    Texture2D background = LoadTexture("Images/2D_courtSt.png");
+
 
     
-    SpriteAnimation _animation;
+    SpriteAnimation waffle_animation; // waffles updated animation
     SpriteAnimation idleAnimation;
     SpriteAnimation walkingForwardAnimation;
     SpriteAnimation walkingBackwardAnimation;
     SpriteAnimation jumpingAnimationRight;
     SpriteAnimation jumpingAnimationLeft;
+    SpriteAnimation hissingAnimation; // maybe make this left and right really dont know if I wanna do that
     
-
 
 
 
@@ -76,6 +79,7 @@ int main(){
     };
     idleAnimation = CreateSpriteAnimation(Waffle, 2, idolFrames, 8);
 
+
     Rectangle walkingForwardFrames[] = { 
     (Rectangle){waffle_index * waffleSize, 128, waffleSize, waffleSize}, // x, y , width, height
     (Rectangle){waffle_index + 1* waffleSize, 128, waffleSize, waffleSize}, 
@@ -88,6 +92,7 @@ int main(){
 
     };
     walkingForwardAnimation = CreateSpriteAnimation(Waffle, 4, walkingForwardFrames, 8);
+
 
     Rectangle walkingBackwardFrames[] = { 
     (Rectangle){waffle_index * waffleSize, 160, waffleSize, waffleSize}, // x, y, width, height fix
@@ -115,6 +120,7 @@ int main(){
     };
     jumpingAnimationRight = CreateSpriteAnimation(Waffle, 5, jumpingRightFrames, 7);
 
+
     Rectangle jumpingLeftFrames[] = {
     (Rectangle){waffle_index * waffleSize, 320, waffleSize, waffleSize},
     (Rectangle){waffle_index + 1 * waffleSize, 320, waffleSize, waffleSize},
@@ -126,21 +132,48 @@ int main(){
 
 
     };
+
     jumpingAnimationLeft= CreateSpriteAnimation(Waffle, 5, jumpingLeftFrames, 7);
 
+
+    Rectangle hissingFrames[] = {
+    (Rectangle){waffle_index * waffleSize, 288, waffleSize, waffleSize},
+    (Rectangle){waffle_index + 1 * waffleSize, 288, waffleSize, waffleSize},
+    (Rectangle){waffle_index + 2 * waffleSize, 288, waffleSize, waffleSize},
+    (Rectangle){waffle_index + 3 * waffleSize, 288, waffleSize, waffleSize},
+    (Rectangle){waffle_index + 4 * waffleSize, 288, waffleSize, waffleSize},
+    (Rectangle){waffle_index + 5 * waffleSize, 288, waffleSize, waffleSize}, 
+    (Rectangle){waffle_index + 6 * waffleSize, 288, waffleSize, waffleSize},
+    (Rectangle){waffle_index + 7 * waffleSize, 288, waffleSize, waffleSize}
+
+
+    };
+    hissingAnimation = CreateSpriteAnimation(Waffle, 5, hissingFrames, 8);
+
+
+
+    // sound
+    InitAudioDevice();
     Sound meow = LoadSound("");
+    Sound hiss = LoadSound("Sounds/hissing.wav");
+    //SetSoundVolume(hiss, 1.0f);
+
+    // fps
     SetTargetFPS(60);
-    _animation = idleAnimation; // this sets it to the idle if nothing else is pressed
+    waffle_animation = idleAnimation; // this sets it to the idle if nothing else is pressed
+
+
     while (!WindowShouldClose()){
     
     camera.target = (Vector2){wafflePos.x+waffleSize,screenHeight};// camera follows the Waffle
 
+    // x direction
     if (IsKeyDown(KEY_RIGHT)) { // Dont need x bounds because its going to be a side scroller
         wafflePos.x += x_velocity;
         isMoving = 1;
         isRight = 1;
         if (!isJumping){ // to account for when your in the air and pusing the right key
-        _animation = walkingForwardAnimation;
+        waffle_animation = walkingForwardAnimation;
         }
     }
     else if (IsKeyDown(KEY_LEFT) && wafflePos.x > 0) { 
@@ -148,12 +181,14 @@ int main(){
         isMoving = 1;
         isRight = 0;
         if(!isJumping){
-        _animation = walkingBackwardAnimation;
+        waffle_animation = walkingBackwardAnimation;
         }
     }
     else{
         isMoving = 0;
     }
+
+    // y direction
     if (IsKeyDown(KEY_UP) && wafflePos.y + waffleSize*scale >= screenHeight && canJump) { 
 
         y_velocity = jumpForce; 
@@ -165,16 +200,26 @@ int main(){
             y_velocity = jumpForce; 
         }
         if (isRight) {
-        _animation = jumpingAnimationRight;
+        waffle_animation = jumpingAnimationRight;
         }
         else if (!isRight){
-        _animation = jumpingAnimationLeft;
+        waffle_animation = jumpingAnimationLeft;
         }
     }
- 
 
-    if (!isMoving && !isJumping){
-        _animation = idleAnimation; // this sets it to the idle if nothing else is pressed
+    // special keys
+    if (IsKeyDown(KEY_SPACE)){ // push space to hiss (fix it when you hold in space rn it loops the audio)
+        isHissing = 1;
+        waffle_animation = hissingAnimation;
+        PlaySound(hiss);
+    }
+    else if (IsKeyUp(KEY_SPACE)){
+        isHissing = 0;
+    }
+    
+
+    if (!isMoving && !isJumping && !isHissing){
+        waffle_animation = idleAnimation; // this sets it to the idle if nothing else is pressed
     }
     if (wafflePos.y >= screenHeight - waffleSize) {
         canJump = 1; // Reset the ability to jump when on the ground
@@ -194,19 +239,21 @@ int main(){
 
         // background
         ClearBackground(WHITE);
-        DrawTexture(background, 0, 0, WHITE);
+        DrawTexture(background, -(float)screenWidth /6, 0, WHITE);
         DrawText("move waffle with arrow keys", 10, 10, 20, WHITE);
 
+        // animations
         Rectangle dest = (Rectangle){wafflePos.x, wafflePos.y, waffleSize * scale, waffleSize * scale}; 
         Vector2 origin = {0, waffleSize*(scale-1)};
-        if (_animation.rectangles != NULL) {
-        DrawSpriteAnimationPro(_animation, dest, origin, 0, WHITE); // has this in it //DrawTexturePro(Waffle, source, dest, (Vector2){0, 0}, 0, WHITE); // Change the origin of the waffle and this //Rectangle source = (Rectangle){waffle_index * waffleSize, 0, waffleSize, waffleSize};
-        //DisposeSpriteAnimation(_animation); // deallocate memory
+        if (waffle_animation.rectangles != NULL) {
+        DrawSpriteAnimationPro(waffle_animation, dest, origin, 0, WHITE); // has this in it //DrawTexturePro(Waffle, source, dest, (Vector2){0, 0}, 0, WHITE); // Change the origin of the waffle and this //Rectangle source = (Rectangle){waffle_index * waffleSize, 0, waffleSize, waffleSize};
+        //DisposeSpriteAnimation(waffle_animation); // deallocate memory
         }
         EndMode2D();
         EndDrawing();
     }
     UnloadTexture(background);
+    CloseAudioDevice();
     CloseWindow();
     return 0;
 }
