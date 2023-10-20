@@ -20,7 +20,7 @@ typedef struct SpriteAnimation
 
 } SpriteAnimation;
 
-SpriteAnimation CreateSpriteAnimation(Texture2D Waffle, int framesPerSecond, Rectangle rectangles[], int Length);
+SpriteAnimation CreateSpriteAnimation(Texture2D atlas, int framesPerSecond, Rectangle rectangles[], int Length);
 void DisposeSpriteAnimation(SpriteAnimation animation);
-void DrawSpriteAnimationPro(SpriteAnimation animation, Rectangle dest, Vector2 origin, float rotation, Color tint);
+void DrawSpriteAnimationPro(SpriteAnimation animation, Rectangle destination, Vector2 theOrigin, float rotation, Color tint);
 #endif

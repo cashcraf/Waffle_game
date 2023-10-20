@@ -18,24 +18,32 @@ class Rat
 {
 public:
 //your code here (constructors getters setters and function headers)
-Rat(Vector2 position, float width, float height); // constructor
+Rat(Vector2 startingPosition); // constructor
 
-Rectangle GetPosition(){return position;}
-float GetWidth(){return width;}
-float GetHeight(){return height;}
+// getters
+Vector2 GetPosition(){return ratPos;}
 
+// animation stuff
+void initializeAnimations();
+void doAnimations();
+
+// physics and updating 
+void UpdatePhysics();
+void UpdateKeysAndAnimations();
 
 void Update();
 bool Dead();
 
 
 private:
-    Rectangle position;
-    float width;
-    float height;
+    const int screenWidth = 800;
+    const int screenHeight = 450;
     SpriteAnimation rat_animation; // enemy rats updated animation
     SpriteAnimation ratWalk;
+    SpriteAnimation ratDie;
     Texture2D rat = LoadTexture("Images/enemy_rat.png");
     const float ratSize = 32;
+    float scale = 4.0f;
+    Vector2 ratPos;
 };
 #endif
