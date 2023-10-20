@@ -15,11 +15,54 @@
 
     Rat::Rat(Vector2 startingPosition){
         ratPos = startingPosition; // initialize rat pos at its staring position
+        hitbox = {ratPos.x, ratPos.y, ratSize*(scale-1), ratSize*(scale-1)};
+        isDead = 0;
 
     }
     void Rat::Update(){
         UpdatePhysics();
-        UpdateKeysAndAnimations();
+    }
+
+    void Rat::UpdatePhysics(){
+        // to do
+        if (!isDead){
+        float moveSpeed = 1.0;
+        ratPos.x -= moveSpeed;
+        hitbox = {ratPos.x, ratPos.y, ratSize*(scale-1), ratSize*(scale-1)};
+        }
+        else {
+            ratPos = ratPos;
+        }
+    }
+
+void Rat::doAnimations() {
+    Rectangle ratDest = {ratPos.x, ratPos.y, ratSize * scale, ratSize * scale};
+    Vector2 ratOrigin = {0, ratSize * (scale - 1)};
+
+    if (isDead && !ratDied) {
+        // Play the dying animation
+        DrawSpriteAnimationPro(ratDie, ratDest, ratOrigin, 0, WHITE);
+        currentFrame ++;
+
+        if (currentFrame >= 10) {
+            // Once the dying animation finishes, switch to the dead state
+            currentFrame = 0;
+            rat_animation = ratDead;
+            ratDied = 1;
+
+        }
+    } else {
+        // Draw the living animation
+        if (rat_animation.rectangles != NULL) {
+            DrawSpriteAnimationPro(rat_animation, ratDest, ratOrigin, 0, WHITE);
+        }
+    }
+}
+
+    bool Rat::Dead(){ // Idk what I want this to return yet
+        isDead = 1;
+        //rat_animation = ratDie;
+        return isDead;
     }
 
     void Rat::initializeAnimations(){
@@ -39,8 +82,8 @@
         ratWalk = CreateSpriteAnimation(rat, 10, ratWalkFrames, 10);
         rat_animation = ratWalk; // starts out alive and walking
 
-        // die animations
-        Rectangle ratDieFrames[] = {
+        // dying animations
+        Rectangle ratDyingFrames[] = {
         (Rectangle){0, 32, ratSize, ratSize},
         (Rectangle){ 1 * ratSize, 32, ratSize, ratSize},
         (Rectangle){2 * ratSize, 32, ratSize, ratSize},
@@ -52,31 +95,9 @@
 
 
         };
-        ratDie = CreateSpriteAnimation(rat, 10, ratDieFrames, 10);
+        ratDie = CreateSpriteAnimation(rat, 10, ratDyingFrames, 10);
 
+        Rectangle ratDeadFrame[] = { 7* ratSize, 32, ratSize, ratSize};
+        ratDead = CreateSpriteAnimation(rat, 1, ratDeadFrame, 1);
 
-    }
-
-    void Rat::UpdatePhysics(){
-        // to do
-        float moveSpeed = 1.0;
-        ratPos.x -= moveSpeed;
-    }
-
-    void Rat::UpdateKeysAndAnimations(){
-        // to do
-    }
-
-    void Rat::doAnimations(){ // not working its not the camera or the background not include path its not waffle not update
-        // animations 
-        Rectangle ratDest = (Rectangle){ratPos.x, ratPos.y, ratSize *scale, ratSize*scale}; 
-        Vector2 ratOrigin = {0,ratSize*(scale-1)};
-        if (rat_animation.rectangles != NULL) {
-        DrawSpriteAnimationPro(rat_animation, ratDest, ratOrigin, 0, WHITE); // has this in it //DrawTexturePro(Waffle, source, dest, (Vector2){0, 0}, 0, WHITE); // Change the origin of the waffle and this //Rectangle source = (Rectangle){waffle_index * waffleSize, 0, waffleSize, waffleSize};
-        }
-}
-    bool Rat::Dead(){ // Idk what I want this to return yet
-        bool isDead = 1;
-        rat_animation = ratDie;
-        return isDead;
     }

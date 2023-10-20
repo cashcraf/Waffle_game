@@ -3,7 +3,7 @@
 *  @author: cashcraf
 *  @date: 2023-10-18 
 *  @brief: this is the def file for waffle.h
-*/
+*/ 
  
 #include "raylib.h"
 #include <stdlib.h>
@@ -15,11 +15,14 @@ using namespace std;
 Waffle::Waffle(Vector2 wafflePosition){
     wafflePos = wafflePosition;
     camera = InitiateCamera((Vector2){wafflePos.x + waffleSize * scale / 2, wafflePos.y + waffleSize * scale / 2}, (float)screenWidth, (float)screenHeight);
+    hitbox = {wafflePos.x, wafflePos.y, waffleSize, waffleSize};
 }
 
 void Waffle::Update(){
+    if (!lost){
     UpdateKeysAndAnimations();
     UpdatePhysics();
+    }
 }
 
 void Waffle::doAnimations(){
@@ -34,7 +37,8 @@ void Waffle::doAnimations(){
 
 void Waffle::UpdateKeysAndAnimations(){
     // x direction
-    if (IsKeyDown(KEY_RIGHT)) { // Dont need x bounds because its going to be a side scroller
+    if (!lost){
+    if (IsKeyDown(KEY_RIGHT) && !isHissing) { // Dont need x bounds because its going to be a side scroller
         wafflePos.x += x_velocity;
         isMoving = 1;
         isRight = 1;
@@ -42,7 +46,7 @@ void Waffle::UpdateKeysAndAnimations(){
         waffle_animation = walkingForwardAnimation;
         }
     }
-    else if (IsKeyDown(KEY_LEFT) && wafflePos.x > 0) { 
+    else if (IsKeyDown(KEY_LEFT) && wafflePos.x > 0 && !isHissing) { 
         wafflePos.x -= x_velocity;
         isMoving = 1;
         isRight = 0;
@@ -55,7 +59,7 @@ void Waffle::UpdateKeysAndAnimations(){
     }
 
     // y direction
-    if (IsKeyDown(KEY_UP) && wafflePos.y + waffleSize*scale >= screenHeight && canJump) { 
+    if (IsKeyDown(KEY_UP) && wafflePos.y + waffleSize*scale >= screenHeight && canJump && !isHissing) { 
 
         y_velocity = jumpForce; 
         canJump = 0; // no double jumps
@@ -70,13 +74,22 @@ void Waffle::UpdateKeysAndAnimations(){
     }
 
     // special keys
-    if (IsKeyDown(KEY_SPACE)){ // push space to hiss (fix it when you hold in space rn it loops the audio)
-        isHissing = 1;
+    static bool spaceKeyDown = false; // Static variable to track the state of the space key
+     if (IsKeyPressed(KEY_SPACE)) {
+        isHissing = true;
         waffle_animation = hissingAnimation;
         PlaySound(hiss);
+        spaceKeyDown = true; // Set the flag to true
     }
-    else if (IsKeyUp(KEY_SPACE)){
-        isHissing = 0;
+
+    // Check if the space key is released
+    if (IsKeyReleased(KEY_SPACE)) {
+        spaceKeyDown = false; // Reset the flag
+    }
+
+    if (!spaceKeyDown) {
+        StopSound(hiss);
+        isHissing = false;
     }
     
 
@@ -87,6 +100,8 @@ void Waffle::UpdateKeysAndAnimations(){
         canJump = 1; // Reset the ability to jump when on the ground
         isJumping = 0;
     }
+    hitbox = {wafflePos.x, wafflePos.y, waffleSize, waffleSize}; // update hitbox
+    }
 
 }
 void Waffle::UpdatePhysics(){
@@ -96,7 +111,15 @@ void Waffle::UpdatePhysics(){
         // Ensure the character stays on the ground
         wafflePos.y = screenHeight - waffleSize;
         y_velocity = 0;
+    hitbox = {wafflePos.x, wafflePos.y, waffleSize, waffleSize}; // update hitbox
+    
     }
+}
+bool Waffle::lose(){
+    // lose makes waffle nap and not able to move
+    lost = true;
+    waffle_animation = nappingAnimation;
+    return lost;
 }
 Vector2 Waffle::setCameraTarget(){
     Vector2 target;
@@ -167,13 +190,11 @@ void Waffle::initializeAnimations(){
     (Rectangle){waffle_index + 2 * waffleSize, 320, waffleSize, waffleSize},
     (Rectangle){waffle_index + 3 * waffleSize, 320, waffleSize, waffleSize},
     (Rectangle){waffle_index + 4 * waffleSize, 320, waffleSize, waffleSize},
-    (Rectangle){waffle_index + 5 * waffleSize, 320, waffleSize, waffleSize}, 
+    (Rectangle){waffle_index + 5 * waffleSize, 320, waffleSize, waffleSize},
     (Rectangle){waffle_index + 6 * waffleSize, 320, waffleSize, waffleSize}
-
-
     };
 
-    jumpingAnimationLeft= CreateSpriteAnimation(waffle, 7, jumpingLeftFrames, 7);
+    jumpingAnimationLeft= CreateSpriteAnimation(waffle, 3, jumpingLeftFrames, 3);
 
 
     Rectangle hissingFrames[] = {
@@ -189,4 +210,17 @@ void Waffle::initializeAnimations(){
 
     };
     hissingAnimation = CreateSpriteAnimation(waffle, 8, hissingFrames, 8);
+
+    Rectangle nappingFrames[] = {
+    (Rectangle){waffle_index * waffleSize, 192, waffleSize, waffleSize},
+    (Rectangle){waffle_index + 1 * waffleSize, 192, waffleSize, waffleSize},
+    (Rectangle){waffle_index + 2 * waffleSize, 192, waffleSize, waffleSize},
+    (Rectangle){waffle_index + 3 * waffleSize, 192, waffleSize, waffleSize},
+    };
+
+    nappingAnimation= CreateSpriteAnimation(waffle, 3, nappingFrames, 3);
+}
+void Waffle::initializeSounds(){
+    hiss = LoadSound("Sounds/hissing.wav");
+    meow = LoadSound("");
 }

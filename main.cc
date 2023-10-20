@@ -28,7 +28,13 @@ int main() {
 
     // Initialize enemys
     Rat rat1(Vector2{1000, screenHeight - 32}); // Create an instance of the Rat class (screenHeight - 32 puts it at waffles height)
-    rat1.initializeAnimations();
+    rat1.initializeAnimations(); // maybe make a vector of rats or something 
+
+    // boolean values for enemy collisions
+    bool isRat1Hit = false; // not in contact by default
+    bool rat1Dead = false;
+    bool game_restart = false;
+
 
     // camera stuff
     Camera2D camera = waffle.getWafflesCamera();
@@ -44,14 +50,27 @@ int main() {
 
     // Set up the game loop
     while (!WindowShouldClose()) {
-
+        waffle.initializeSounds();
         Vector2 wafflePos = waffle.getWafflePos();
         camera.target = (Vector2){wafflePos.x+32,screenHeight};// camera follows the Waffle
+        Rectangle waffleHitbox = waffle.getHitbox(); // next make a hit animation that hits the rat and kills them first try by using a tiny rectangle if a button is pushed be made and a hitting animation plays 
+        Rectangle rat1Hitbox = rat1.getHitbox();
+        
+        // enemy collisons
+        // if you add a vector of rats just change some stuff around
+        if (!rat1Dead){
+        isRat1Hit = CheckCollisionRecs(waffleHitbox, rat1Hitbox); // checks if rat 1 has collided with waffle
+        }
+        if (isRat1Hit){
+            rat1Dead = rat1.Dead(); // another debug placeholder 
+            bool game_restart = waffle.lose(); // we dont want waffle to lose if hit once but this is a placeholder game restart will be true if you lose
+
+        }
 
         // Update game objects
         waffle.Update();
         rat1.Update();
-
+    
         // Handle user input (e.g., checking for key presses)
 
         // Clear and draw game objects
@@ -64,6 +83,7 @@ int main() {
         DrawText("move waffle with arrow keys", 10, 10, 20, WHITE);
         waffle.doAnimations();
         rat1.doAnimations();
+
         EndMode2D();
         EndDrawing();
     }
