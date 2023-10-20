@@ -24,16 +24,19 @@ public:
     // initilizers (setters)
     void initializeAnimations();
     Vector2 setCameraTarget();
+    void initializeSounds();
 
     //getters
     Camera2D getWafflesCamera() {return camera;}
     Vector2 getWafflePos(){return wafflePos;}
+    Rectangle getHitbox(){return hitbox;}
 
     // updaters
     void Update();
     void UpdateKeysAndAnimations();
     void UpdatePhysics();
     void doAnimations();
+    bool lose(); // loses the game and returns true
 
 
 private:
@@ -45,6 +48,7 @@ private:
     SpriteAnimation jumpingAnimationRight;
     SpriteAnimation jumpingAnimationLeft;
     SpriteAnimation hissingAnimation; // maybe make this left and right really dont know if I wanna do that
+    SpriteAnimation nappingAnimation;
     Texture2D waffle = LoadTexture("Images/Waffle_Sprite_Sheet.png");
 
     // screen values
@@ -55,6 +59,7 @@ private:
     Camera2D camera = InitiateCamera((Vector2){wafflePos.x + waffleSize * scale / 2, wafflePos.y + waffleSize * scale / 2}, (float)screenWidth, (float)screenHeight);
 
     // waffle postion values
+    Rectangle hitbox;
     Vector2 wafflePos;
     const float waffleSize = 32; // size of how long and high the sprite is
     float waffle_index = 0; // which animation waffle is on
@@ -72,10 +77,11 @@ private:
     const float gravity = 0.4;
     float x_velocity = 5;
     float y_velocity = 0; // because of the origin being 0,0 being the top left
+    bool lost = 0;
 
     // Sound
-    Sound meow = LoadSound("");
-    Sound hiss = LoadSound("Sounds/hissing.wav");
+    Sound meow;
+    Sound hiss;
 
 
 };
