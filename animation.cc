@@ -30,9 +30,9 @@ void DisposeSpriteAnimation(SpriteAnimation animation){ // deallocate memory
     free(animation.rectangles);
 }
 
-void DrawSpriteAnimationPro(SpriteAnimation animation, Rectangle dest, Vector2 origin, float rotation, Color tint){
+void DrawSpriteAnimationPro(SpriteAnimation animation, Rectangle destination, Vector2 theOrigin, float rotation, Color tint){
     int index = (int) (GetTime() * animation.framesPerSecond) % animation.rectanglesLength;
     
     Rectangle source = animation.rectangles[index];
-    DrawTexturePro(animation.atlas, source, dest, origin, rotation, tint);
+    DrawTexturePro(animation.atlas, source, destination, theOrigin, rotation, tint);
 }

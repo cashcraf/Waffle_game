@@ -1,5 +1,5 @@
 /**
-*  @file: Waffle.cc
+*  @file: waffle.cc
 *  @author: cashcraf
 *  @date: 2023-10-18 
 *  @brief: this is the def file for waffle.h
@@ -131,7 +131,7 @@ void Waffle::initializeAnimations(){
     (Rectangle){waffle_index + 7* waffleSize, 128, waffleSize, waffleSize}, 
 
     };
-    walkingForwardAnimation = CreateSpriteAnimation(waffle, 4, walkingForwardFrames, 8);
+    walkingForwardAnimation = CreateSpriteAnimation(waffle, 8, walkingForwardFrames, 8);
 
 
     Rectangle walkingBackwardFrames[] = { 
@@ -145,7 +145,7 @@ void Waffle::initializeAnimations(){
     (Rectangle){waffle_index + 7* waffleSize, 160, waffleSize, waffleSize}, 
 
     };
-    walkingBackwardAnimation = CreateSpriteAnimation(waffle, 2, walkingBackwardFrames, 8);
+    walkingBackwardAnimation = CreateSpriteAnimation(waffle, 8, walkingBackwardFrames, 8);
 
 
     Rectangle jumpingRightFrames[] = {
@@ -158,7 +158,7 @@ void Waffle::initializeAnimations(){
     (Rectangle){waffle_index + 6 * waffleSize, 256, waffleSize, waffleSize}
 
     };
-    jumpingAnimationRight = CreateSpriteAnimation(waffle, 5, jumpingRightFrames, 7);
+    jumpingAnimationRight = CreateSpriteAnimation(waffle, 7, jumpingRightFrames, 7);
 
 
     Rectangle jumpingLeftFrames[] = {
@@ -173,7 +173,7 @@ void Waffle::initializeAnimations(){
 
     };
 
-    jumpingAnimationLeft= CreateSpriteAnimation(waffle, 5, jumpingLeftFrames, 7);
+    jumpingAnimationLeft= CreateSpriteAnimation(waffle, 7, jumpingLeftFrames, 7);
 
 
     Rectangle hissingFrames[] = {
@@ -188,5 +188,5 @@ void Waffle::initializeAnimations(){
 
 
     };
-    hissingAnimation = CreateSpriteAnimation(waffle, 5, hissingFrames, 8);
+    hissingAnimation = CreateSpriteAnimation(waffle, 8, hissingFrames, 8);
 }

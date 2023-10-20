@@ -27,7 +27,8 @@ int main() {
     waffle.initializeAnimations();
 
     // Initialize enemys
-    Rat rat1(Vector2{10, 10}, 32, 32); // Create an instance of the Rat class
+    Rat rat1(Vector2{1000, screenHeight - 32}); // Create an instance of the Rat class (screenHeight - 32 puts it at waffles height)
+    rat1.initializeAnimations();
 
     // camera stuff
     Camera2D camera = waffle.getWafflesCamera();
@@ -62,6 +63,7 @@ int main() {
         DrawTexture(background, -(float)screenWidth /6, 0, WHITE);
         DrawText("move waffle with arrow keys", 10, 10, 20, WHITE);
         waffle.doAnimations();
+        rat1.doAnimations();
         EndMode2D();
         EndDrawing();
     }
