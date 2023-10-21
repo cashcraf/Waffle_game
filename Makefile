@@ -1,5 +1,5 @@
 # Compiler and flags
-CC = cc
+CC = g++
 CXX = x86_64-w64-mingw32-g++
 CFLAGS = -Wall
 LDFLAGS = -I/home/cashcraf/raylib/src -L/home/cashcraf/raylib/src
