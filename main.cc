@@ -13,6 +13,7 @@
 #include "Headers/camera.h"
 #include "Headers/rat.h"
 #include "Headers/waffle.h"
+#include <vector>
 
 using namespace std;
 int main() {
@@ -27,12 +28,19 @@ int main() {
     waffle.initializeAnimations();
 
     // Initialize enemys
-    Rat rat1(Vector2{1000, screenHeight - 32}); // Create an instance of the Rat class (screenHeight - 32 puts it at waffles height)
-    rat1.initializeAnimations(); // maybe make a vector of rats or something 
+    vector<Rat> rats;
+    const int numRats = 5; // You can change this to the number of rats you want
+
+    for (int i = 0; i < numRats; i++) {
+        Vector2 startingPosition = {(float)GetRandomValue(0, screenWidth), screenHeight - 32};
+        Rat rat(startingPosition);
+        rat.initializeAnimations();
+        rats.push_back(rat);
+    }
 
     // boolean values for enemy collisions
-    bool isRat1Hit = false; // not in contact by default
-    bool rat1Dead = false;
+    vector<bool> isRatHit (numRats, false); // not in contact by default
+    vector<bool> ratDead(numRats, false);
     bool game_restart = false;
 
 
@@ -44,32 +52,37 @@ int main() {
 
     // sound stuff
     InitAudioDevice();
+    waffle.initializeSounds();
 
     // fps
     SetTargetFPS(60);
 
     // Set up the game loop
     while (!WindowShouldClose()) {
-        waffle.initializeSounds();
+
         Vector2 wafflePos = waffle.getWafflePos();
         camera.target = (Vector2){wafflePos.x+32,screenHeight};// camera follows the Waffle
         Rectangle waffleHitbox = waffle.getHitbox(); // next make a hit animation that hits the rat and kills them first try by using a tiny rectangle if a button is pushed be made and a hitting animation plays 
-        Rectangle rat1Hitbox = rat1.getHitbox();
+        for (int i = 0; i < numRats; i++) {
+        Rectangle rat1Hitbox = rats[i].getHitbox();
         
         // enemy collisons
         // if you add a vector of rats just change some stuff around
-        if (!rat1Dead){
-        isRat1Hit = CheckCollisionRecs(waffleHitbox, rat1Hitbox); // checks if rat 1 has collided with waffle
+        if (!ratDead[i]){
+        isRatHit[i] = CheckCollisionRecs(waffleHitbox, rat1Hitbox); // checks if rat 1 has collided with waffle
         }
-        if (isRat1Hit){
-            rat1Dead = rat1.Dead(); // another debug placeholder 
+        if (isRatHit[i]){
+            ratDead[i] = rats[i].Dead(); // another debug placeholder 
             bool game_restart = waffle.lose(); // we dont want waffle to lose if hit once but this is a placeholder game restart will be true if you lose
 
+        }
         }
 
         // Update game objects
         waffle.Update();
-        rat1.Update();
+         for (Rat& rat : rats) {
+            rat.Update();
+        }
     
         // Handle user input (e.g., checking for key presses)
 
@@ -82,7 +95,9 @@ int main() {
         DrawTexture(background, -(float)screenWidth /6, 0, WHITE);
         DrawText("move waffle with arrow keys", 10, 10, 20, WHITE);
         waffle.doAnimations();
-        rat1.doAnimations();
+         for (Rat& rat : rats) {
+            rat.doAnimations();
+        }
 
         EndMode2D();
         EndDrawing();
