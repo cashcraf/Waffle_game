@@ -22,6 +22,7 @@ int main() {
     const int screenWidth = 800;
     const int screenHeight = 450;
     InitWindow(screenWidth, screenHeight, "Waffles big day out");
+    int framesCounter = 0;
 
     // Initialize waffle
     Waffle waffle(Vector2{1, screenHeight - 32}); // because of the origin being 0,0 being the top left); // Create an instance of the Waffle class
@@ -42,6 +43,10 @@ int main() {
     vector<bool> isRatHit (numRats, false); // not in contact by default
     vector<bool> ratDead(numRats, false);
     bool game_restart = false;
+    bool logo = true; // logo screen
+    bool intro = false;
+    bool game = false;
+
 
 
     // camera stuff
@@ -59,6 +64,50 @@ int main() {
 
     // Set up the game loop
     while (!WindowShouldClose()) {
+        if (logo){
+        BeginDrawing();
+
+        ClearBackground(BLUE);
+
+        // Draw your title screen elements here
+        DrawText("Waffles Big Day Out", screenWidth / 2 - MeasureText("Waffles Big Day Out", 40) / 2, screenHeight / 2 - 40, 40, WHITE);
+        DrawText("A game for Samantha", screenWidth / 2 - MeasureText("A game for Samantha", 20) / 2, screenHeight / 2 + 10, 20, WHITE);
+
+        EndDrawing();
+
+        framesCounter++;    // Count frames
+
+            // Wait for 2 seconds (120 frames) before jumping to TITLE screen
+            if (framesCounter > 120)
+            {
+             // Exit the title screen after 2 seconds
+            logo = false;
+            intro = true;
+        }
+        }
+
+    else if (intro) {
+        ClearBackground(BLUE);
+
+        // Draw your title screen elements
+        // fix the size of this
+
+        DrawText ("Oh no, Waffle got hungry and left the house!", screenWidth / 2 - MeasureText("Oh no, Waffle got hungry and left the house!", 20) / 2, screenHeight / 3, 20, WHITE);
+        DrawText("Help him get to his food before he gets too tired and takes a nap", screenWidth / 2 - MeasureText("Help him get to his food before he gets too tired and takes a nap", 20) / 2, screenHeight / 3 + 50, 20, WHITE);
+
+        DrawText("Press SPACE to Start", screenWidth / 2 - MeasureText("Press SPACE to Start", 20) / 2, screenHeight - 50, 20, WHITE);
+
+        EndDrawing();
+
+        if (IsKeyPressed(KEY_SPACE)) {
+            intro = false;
+            game = true;
+        }
+    }
+
+
+        else if (game){
+        ClearBackground(RAYWHITE);
 
         Vector2 wafflePos = waffle.getWafflePos();
         camera.target = (Vector2){wafflePos.x+32,screenHeight};// camera follows the Waffle
@@ -87,11 +136,11 @@ int main() {
         // Handle user input (e.g., checking for key presses)
 
         // Clear and draw game objects
-        BeginDrawing();
+        //BeginDrawing();
         BeginMode2D(camera); // Set camera mode to follow the target
 
         // background
-        ClearBackground(WHITE);
+        //ClearBackground(WHITE);
         DrawTexture(background, -(float)screenWidth /6, 0, WHITE);
         DrawText("move waffle with arrow keys", 10, 10, 20, WHITE);
         waffle.doAnimations();
@@ -101,6 +150,7 @@ int main() {
 
         EndMode2D();
         EndDrawing();
+    }
     }
     UnloadTexture(background);
     CloseAudioDevice();
