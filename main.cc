@@ -21,7 +21,7 @@ int main() {
     // Initialize Raylib and your game objects
     const int screenWidth = 800;
     const int screenHeight = 450;
-    InitWindow(screenWidth, screenHeight, "Waffles big day out");
+    InitWindow(screenWidth, screenHeight, "Waffles Big Day OUt");
     int framesCounter = 0;
 
     // Initialize waffle
@@ -54,6 +54,8 @@ int main() {
 
     // animation stuff
     Texture2D background = LoadTexture("Images/2D_courtSt.png");
+    Texture2D titlePic = LoadTexture("Images/title.png");
+    Texture2D logoPic = LoadTexture("Images/logo.png");
 
     // sound stuff
     InitAudioDevice();
@@ -66,12 +68,9 @@ int main() {
     while (!WindowShouldClose()) {
         if (logo){
         BeginDrawing();
-
-        ClearBackground(BLUE);
-
-        // Draw your title screen elements here
-        DrawText("Waffles Big Day Out", screenWidth / 2 - MeasureText("Waffles Big Day Out", 40) / 2, screenHeight / 2 - 40, 40, WHITE);
-        DrawText("A game for Samantha", screenWidth / 2 - MeasureText("A game for Samantha", 20) / 2, screenHeight / 2 + 10, 20, WHITE);
+        
+        ClearBackground(WHITE);
+        DrawTexture(logoPic, 0, 0, WHITE);
 
         EndDrawing();
 
@@ -87,16 +86,9 @@ int main() {
         }
 
     else if (intro) {
-        ClearBackground(BLUE);
+        ClearBackground(RAYWHITE);
 
-        // Draw your title screen elements
-        // fix the size of this
-
-        DrawText ("Oh no, Waffle got hungry and left the house!", screenWidth / 2 - MeasureText("Oh no, Waffle got hungry and left the house!", 20) / 2, screenHeight / 3, 20, WHITE);
-        DrawText("Help him get to his food before he gets too tired and takes a nap", screenWidth / 2 - MeasureText("Help him get to his food before he gets too tired and takes a nap", 20) / 2, screenHeight / 3 + 50, 20, WHITE);
-
-        DrawText("Press SPACE to Start", screenWidth / 2 - MeasureText("Press SPACE to Start", 20) / 2, screenHeight - 50, 20, WHITE);
-
+        DrawTexture(titlePic, 0, 0, WHITE);
         EndDrawing();
 
         if (IsKeyPressed(KEY_SPACE)) {
@@ -122,7 +114,7 @@ int main() {
         }
         if (isRatHit[i]){
             ratDead[i] = rats[i].Dead(); // another debug placeholder 
-            bool game_restart = waffle.lose(); // we dont want waffle to lose if hit once but this is a placeholder game restart will be true if you lose
+            //bool game_restart = waffle.lose(); // we dont want waffle to lose if hit once but this is a placeholder game restart will be true if you lose
 
         }
         }
