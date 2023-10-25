@@ -30,6 +30,7 @@ public:
     Camera2D getWafflesCamera() {return camera;}
     Vector2 getWafflePos(){return wafflePos;}
     Rectangle getHitbox(){return hitbox;}
+    bool getIsMoving(){return isMoving;}
 
     // updaters
     void Update();
@@ -49,6 +50,8 @@ private:
     SpriteAnimation jumpingAnimationLeft;
     SpriteAnimation hissingAnimation; // maybe make this left and right really dont know if I wanna do that
     SpriteAnimation nappingAnimation;
+    SpriteAnimation clawRightAnimation;
+    SpriteAnimation clawLeftAnimation;
     Texture2D waffle = LoadTexture("Images/Waffle_Sprite_Sheet.png");
 
     // screen values
@@ -70,7 +73,8 @@ private:
     bool isRight = 1;
     bool isHissing = 0;
     bool isLeft = 0;
-
+    bool isHitting = 0;
+    bool staminaMinus1 = 0;
 
     // Physics
     int jumpForce = -8; // raylib coordinate system flipped, 0,0 is top left instead of bottom left so every value is flipped from what you think. which fine but its weird
@@ -82,6 +86,7 @@ private:
     // Sound
     Sound meow;
     Sound hiss;
+    Sound claw;
 
 
 };
