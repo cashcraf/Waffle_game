@@ -23,6 +23,9 @@ int main() {
     const int screenHeight = 450;
     InitWindow(screenWidth, screenHeight, "Waffles Big Day OUt");
     int framesCounter = 0;
+    float stamina = 300;
+    Color staminaBorderColor = DARKGRAY;
+    Color staminaFillColor = GREEN;
 
     // Initialize waffle
     Waffle waffle(Vector2{1, screenHeight - 32}); // because of the origin being 0,0 being the top left); // Create an instance of the Waffle class
@@ -33,14 +36,14 @@ int main() {
     const int numRats = 5; // You can change this to the number of rats you want
 
     for (int i = 0; i < numRats; i++) {
-        Vector2 startingPosition = {(float)GetRandomValue(0, screenWidth), screenHeight - 32};
+        Vector2 startingPosition = {(float)GetRandomValue(0, 10000), screenHeight - 32};
         Rat rat(startingPosition);
         rat.initializeAnimations();
         rats.push_back(rat);
     }
 
     // boolean values for enemy collisions
-    vector<bool> isRatHit (numRats, false); // not in contact by default
+    vector<bool> isWaffleHit (numRats, false); // not in contact by default
     vector<bool> ratDead(numRats, false);
     bool game_restart = false;
     bool logo = true; // logo screen
@@ -51,6 +54,10 @@ int main() {
 
     // camera stuff
     Camera2D camera = waffle.getWafflesCamera();
+
+    // Stamina bar
+    Rectangle staminaBar = {camera.target.x + 10, camera.target.y + 10, stamina, 20};
+    int staminaSubtract = 0;
 
     // animation stuff
     Texture2D background = LoadTexture("Images/2D_courtSt.png");
@@ -102,7 +109,11 @@ int main() {
         ClearBackground(RAYWHITE);
 
         Vector2 wafflePos = waffle.getWafflePos();
+        if (wafflePos.x < 6500){ // camera bounds
         camera.target = (Vector2){wafflePos.x+32,screenHeight};// camera follows the Waffle
+        }
+        
+        // Hitboxes
         Rectangle waffleHitbox = waffle.getHitbox(); // next make a hit animation that hits the rat and kills them first try by using a tiny rectangle if a button is pushed be made and a hitting animation plays 
         for (int i = 0; i < numRats; i++) {
         Rectangle rat1Hitbox = rats[i].getHitbox();
@@ -110,29 +121,40 @@ int main() {
         // enemy collisons
         // if you add a vector of rats just change some stuff around
         if (!ratDead[i]){
-        isRatHit[i] = CheckCollisionRecs(waffleHitbox, rat1Hitbox); // checks if rat 1 has collided with waffle
+        isWaffleHit[i] = CheckCollisionRecs(waffleHitbox, rat1Hitbox); // checks if rat 1 has collided with waffle
         }
-        if (isRatHit[i]){
-            ratDead[i] = rats[i].Dead(); // another debug placeholder 
-            //bool game_restart = waffle.lose(); // we dont want waffle to lose if hit once but this is a placeholder game restart will be true if you lose
-
+        if (isWaffleHit[i] && !ratDead[i]){
+            stamina -= 10;
         }
         }
 
+        //ratDead[i] = rats[i].Dead(); //when we want the rat to die
+
+        staminaSubtract = waffle.getIsMoving();
+        if (staminaSubtract){
+            stamina -= 0.05; // update by how much movement subtracts the stamina
+        }
+
+        if (stamina <= 0) {
+        game_restart = waffle.lose(); // when waffle runs out of stamina
+        }
+        
         // Update game objects
         waffle.Update();
+
          for (Rat& rat : rats) {
             rat.Update();
         }
-    
-        // Handle user input (e.g., checking for key presses)
 
-        // Clear and draw game objects
-        //BeginDrawing();
-        BeginMode2D(camera); // Set camera mode to follow the target
+        // Stamina bar
+        staminaBar.x = camera.target.x - 100; // puts it in top corner of screen and makes it follow waffle
+        staminaBar.y = camera.target.y - 400;
+        //staminaBar = {camera.target.x, camera.target.y, stamina, 20};
 
+        // Set camera mode to follow the target
+        BeginMode2D(camera); 
+        
         // background
-        //ClearBackground(WHITE);
         DrawTexture(background, -(float)screenWidth /6, 0, WHITE);
         DrawText("move waffle with arrow keys", 10, 10, 20, WHITE);
         waffle.doAnimations();
@@ -140,6 +162,14 @@ int main() {
             rat.doAnimations();
         }
 
+        // Stamina bar
+        float greenWidth = (stamina / 300.0f) * (staminaBar.width - 4); // update change in stamina (-4 for the border)
+        
+        DrawRectangle(staminaBar.x, staminaBar.y, greenWidth, staminaBar.height - 4, LIME); // stamina bar
+
+        DrawRectangleLinesEx(staminaBar, 5, BLACK); // stamina bar outline
+
+        
         EndMode2D();
         EndDrawing();
     }

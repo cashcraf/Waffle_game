@@ -28,7 +28,7 @@
         if (!isDead){
         float moveSpeed = 1.0;
         ratPos.x -= moveSpeed;
-        hitbox = {ratPos.x, ratPos.y, ratSize*(scale-1), ratSize*(scale-1)};
+        hitbox = {ratPos.x, ratPos.y, ratSize-10, ratSize+10};
         }
         else {
             ratPos = ratPos;
