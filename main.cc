@@ -57,7 +57,9 @@ int main() {
 
     // Stamina bar
     Rectangle staminaBar = {camera.target.x + 10, camera.target.y + 10, stamina, 20};
-    int staminaSubtract = 0;
+    bool staminaSubtract = 0;
+    bool staminaSubtractJump = 0;
+    bool staminaSubtractHit = 0;
 
     // animation stuff
     Texture2D background = LoadTexture("Images/2D_courtSt.png");
@@ -115,6 +117,8 @@ int main() {
         
         // Hitboxes
         Rectangle waffleHitbox = waffle.getHitbox(); // next make a hit animation that hits the rat and kills them first try by using a tiny rectangle if a button is pushed be made and a hitting animation plays 
+        // do a getSwatHitbox and make that a rectangle that only returns if waffle is currently hitting
+        
         for (int i = 0; i < numRats; i++) {
         Rectangle rat1Hitbox = rats[i].getHitbox();
         
@@ -124,15 +128,20 @@ int main() {
         isWaffleHit[i] = CheckCollisionRecs(waffleHitbox, rat1Hitbox); // checks if rat 1 has collided with waffle
         }
         if (isWaffleHit[i] && !ratDead[i]){
-            stamina -= 10;
+            stamina -= 4; // change to what makes sense for gameplay
         }
         }
 
         //ratDead[i] = rats[i].Dead(); //when we want the rat to die
 
         staminaSubtract = waffle.getIsMoving();
-        if (staminaSubtract){
+        staminaSubtractJump = waffle.getIsJumping();
+        staminaSubtractHit = waffle.getIsHitting();
+        if (staminaSubtract  && stamina != 0){
             stamina -= 0.05; // update by how much movement subtracts the stamina
+        }
+        if (staminaSubtractJump && stamina != 0){
+            stamina -= 1;
         }
 
         if (stamina <= 0) {
