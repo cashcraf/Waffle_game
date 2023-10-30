@@ -30,7 +30,10 @@ public:
     Camera2D getWafflesCamera() {return camera;}
     Vector2 getWafflePos(){return wafflePos;}
     Rectangle getHitbox(){return hitbox;}
+    Rectangle getHittingHitbox(){return hittingHitbox;}
     bool getIsMoving(){return isMoving;}
+    bool getIsJumping(){return isJumping;}
+    bool getIsHitting(){return isHitting;}
 
     // updaters
     void Update();
@@ -38,7 +41,7 @@ public:
     void UpdatePhysics();
     void doAnimations();
     bool lose(); // loses the game and returns true
-
+    bool win();
 
 private:
     // animation values
@@ -63,6 +66,7 @@ private:
 
     // waffle postion values
     Rectangle hitbox;
+    Rectangle hittingHitbox;
     Vector2 wafflePos;
     const float waffleSize = 32; // size of how long and high the sprite is
     float waffle_index = 0; // which animation waffle is on
@@ -74,7 +78,6 @@ private:
     bool isHissing = 0;
     bool isLeft = 0;
     bool isHitting = 0;
-    bool staminaMinus1 = 0;
 
     // Physics
     int jumpForce = -8; // raylib coordinate system flipped, 0,0 is top left instead of bottom left so every value is flipped from what you think. which fine but its weird
