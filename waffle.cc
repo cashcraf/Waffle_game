@@ -4,7 +4,7 @@
 *  @date: 2023-10-18 
 *  @brief: this is the def file for waffle.h
 */ 
- 
+
 #include "raylib.h"
 #include <stdlib.h>
 #include "Headers/animation.h"
@@ -162,8 +162,13 @@ void Waffle::UpdatePhysics(){
 bool Waffle::lose(){
     // lose makes waffle nap and not able to move
     lost = true;
+    UpdatePhysics();
     waffle_animation = nappingAnimation;
     return lost;
+}
+
+bool Waffle::win(){
+    return false; // fix this to let a win happen
 }
 
 Vector2 Waffle::setCameraTarget(){
