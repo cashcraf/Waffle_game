@@ -37,7 +37,7 @@ void Waffle::doAnimations(){
 
 void Waffle::UpdateKeysAndAnimations(){ // jumping movement looks bad
     // x direction
-    if (!lost){
+    if (!lost && !win){
     if (IsKeyDown(KEY_RIGHT) && !isHissing) { // Dont need x bounds because its going to be a side scroller
         wafflePos.x += x_velocity;
         isMoving = 1;
@@ -220,14 +220,17 @@ bool Waffle::lose(){
     return lost;
 }
 
-
+void Waffle::waffleWins(){ // if waffle wins play the animation and win
+    waffle_animation = winningAnimation; // need to do this
+    win = true;
+    UpdatePhysics();
+}
+ 
 Vector2 Waffle::setCameraTarget(){
     Vector2 target;
     target = (Vector2){wafflePos.x+waffleSize,(float)screenHeight};// camera follows the Waffle
     return target;
 }
-
-
 
 
 void Waffle::initializeAnimations(){
@@ -319,6 +322,16 @@ void Waffle::initializeAnimations(){
     };
 
     clawLeftAnimation = CreateSpriteAnimation(waffle, 6, clawLeftFrames, 6);
+
+    Rectangle winningFrames[] = {
+        (Rectangle){waffle_index * waffleSize, 64, waffleSize, waffleSize},
+        (Rectangle){waffle_index + 1 * waffleSize, 64, waffleSize, waffleSize},
+        (Rectangle){waffle_index + 2* waffleSize, 64, waffleSize, waffleSize},
+        (Rectangle){waffle_index + 3* waffleSize, 64, waffleSize, waffleSize}
+
+    };
+
+    winningAnimation = CreateSpriteAnimation(waffle, 4, winningFrames, 4);
 
     // Create the first phase of the jump animation for right-facing waffle
     Rectangle jumpingPhase1FramesRight[] = {

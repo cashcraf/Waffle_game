@@ -24,8 +24,10 @@ int main() {
     InitWindow(screenWidth, screenHeight, "Waffles Big Day OUt");
     InitAudioDevice();
     int framesCounter = 0;
+    
     Game* level1 = new Game(5,1);
     level1->initializeGame();
+
     // Game level2(5,2);
     // level2.initializeGame();
     
@@ -85,12 +87,15 @@ int main() {
 
 
         else if (game) {
-            if (level1On && !level1Win) {
+            if (level1On) {
                 level1->updateGame();
                 level1->drawGame();
-                level1Restart = level1->checkLose();
 
-                if (level1Restart) {
+                if (!level1Win){
+                level1Restart = level1->checkLose();
+                }
+
+                if (level1Restart && !level1Win) {
                     framesCounter++;
                     if (framesCounter >= 120) // wait 2 seconds then reset the level
                     {
@@ -103,19 +108,25 @@ int main() {
                     }
                     
                 }
+                
+    
+                level1Win = level1->checkWin(); // checks if waffle has won
 
-                level1Win = level1->checkWin(); // do check win
-
-                if (level1Win && !level1Restart) {
+                if (level1Win) {
+                     framesCounter++;
+                     if (framesCounter >= 120) // wait 2 seconds then win the level
+                     {
                     delete level1;
                     level2On = true;
                     level1On = false;
-                    CloseWindow();
+                    framesCounter = 0;
+                    }
                 }
             }
-            // if (level2On){
-            //     // same as level 1 
-            // }
+            else if (level2On){
+                 // same as level 1 
+                 CloseWindow(); // temporary
+             }
 
 
     }

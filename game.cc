@@ -88,6 +88,9 @@ void Game::updateGame() {
     }
 
     win = CheckCollisionRecs(waffleHitbox, winningHitbox);
+    if (win){
+        waffle.waffleWins();
+    }
 
     staminaSubtract = waffle.getIsMoving();
     staminaSubtractJump = waffle.getIsJumping();
