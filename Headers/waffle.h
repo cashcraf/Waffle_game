@@ -41,7 +41,6 @@ public:
     void UpdatePhysics();
     void doAnimations();
     bool lose(); // loses the game and returns true
-    bool win();
 
 private:
     // animation values
@@ -49,12 +48,20 @@ private:
     SpriteAnimation idleAnimation;
     SpriteAnimation walkingForwardAnimation;
     SpriteAnimation walkingBackwardAnimation;
-    SpriteAnimation jumpingAnimationRight;
-    SpriteAnimation jumpingAnimationLeft;
     SpriteAnimation hissingAnimation; // maybe make this left and right really dont know if I wanna do that
     SpriteAnimation nappingAnimation;
     SpriteAnimation clawRightAnimation;
     SpriteAnimation clawLeftAnimation;
+
+    SpriteAnimation jumpingPhase1AnimationRight;
+    SpriteAnimation jumpingPhase2AnimationRight;
+    SpriteAnimation jumpingPhase3AnimationRight;
+    SpriteAnimation jumpingPhase4AnimationRight;
+
+    SpriteAnimation jumpingPhase1AnimationLeft;
+    SpriteAnimation jumpingPhase2AnimationLeft;
+    SpriteAnimation jumpingPhase3AnimationLeft;
+    SpriteAnimation jumpingPhase4AnimationLeft;   
     Texture2D waffle = LoadTexture("Images/Waffle_Sprite_Sheet.png");
 
     // screen values
@@ -80,11 +87,16 @@ private:
     bool isHitting = 0;
 
     // Physics
-    int jumpForce = -8; // raylib coordinate system flipped, 0,0 is top left instead of bottom left so every value is flipped from what you think. which fine but its weird
-    const float gravity = 0.4;
+    int jumpForce = 0; // raylib coordinate system flipped, 0,0 is top left instead of bottom left so every value is flipped from what you think. which fine but its weird
+    const float gravity = 0.2;
     float x_velocity = 5;
     float y_velocity = 0; // because of the origin being 0,0 being the top left
     bool lost = 0;
+
+    // Jump timer
+    float jumpTimer = 0.0f;       // Timer to control jump height
+    float maxJumpDuration = 0.5f; // Maximum duration for a higher jump (adjust as needed)
+
 
     // Sound
     Sound meow;

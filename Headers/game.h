@@ -18,6 +18,7 @@ public:
     void cleanUp();
     bool checkLose();
     bool checkWin();
+    Rectangle getWinningHitbox(){return winningHitbox;}
 
 private:
     int levelnum;
@@ -25,6 +26,9 @@ private:
     const float screenWidth = 800;
 
     Texture2D background;
+    Texture2D winningTexture;
+    SpriteAnimation winningWaffle;
+
 
     // Stamina 
     float stamina;
@@ -39,7 +43,11 @@ private:
     // boolean values for enemy collisions
     std::vector<bool> isWaffleHit;
     std::vector<bool> ratDead;
+    std::vector<bool> isWaffleHitting;
+    bool isHitting;
     bool game_restart;
+    Rectangle winningHitbox;
+    bool win;
 
     // camera stuff
     Camera2D camera;
