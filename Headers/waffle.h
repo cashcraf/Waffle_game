@@ -41,6 +41,7 @@ public:
     void UpdatePhysics();
     void doAnimations();
     bool lose(); // loses the game and returns true
+    void waffleWins();
 
 private:
     // animation values
@@ -52,6 +53,7 @@ private:
     SpriteAnimation nappingAnimation;
     SpriteAnimation clawRightAnimation;
     SpriteAnimation clawLeftAnimation;
+    SpriteAnimation winningAnimation;
 
     SpriteAnimation jumpingPhase1AnimationRight;
     SpriteAnimation jumpingPhase2AnimationRight;
@@ -85,6 +87,7 @@ private:
     bool isHissing = 0;
     bool isLeft = 0;
     bool isHitting = 0;
+    bool win = 0;
 
     // Physics
     int jumpForce = 0; // raylib coordinate system flipped, 0,0 is top left instead of bottom left so every value is flipped from what you think. which fine but its weird
