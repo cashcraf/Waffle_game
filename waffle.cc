@@ -35,7 +35,7 @@ void Waffle::doAnimations(){
         }
 }
 
-void Waffle::UpdateKeysAndAnimations(){
+void Waffle::UpdateKeysAndAnimations(){ // jumping movement looks bad
     // x direction
     if (!lost){
     if (IsKeyDown(KEY_RIGHT) && !isHissing) { // Dont need x bounds because its going to be a side scroller
@@ -61,19 +61,55 @@ void Waffle::UpdateKeysAndAnimations(){
     }
 
     // y direction
-    if (IsKeyDown(KEY_UP) && wafflePos.y + waffleSize*scale >= screenHeight && canJump && !isHissing) { 
-
-        y_velocity = jumpForce; 
+    if (IsKeyDown(KEY_UP) && canJump && !isHissing) {
+        isJumping = true;
         canJump = 0; // no double jumps
         isMoving = 1;
-        isJumping = 1;
+        jumpTimer += GetFrameTime();
         if (isRight && !isHitting) {
-        waffle_animation = jumpingAnimationRight;
+            if (jumpTimer < 0.1f) {
+                waffle_animation = jumpingPhase1AnimationRight;
+            } else if (jumpTimer < 0.2f) {
+                waffle_animation = jumpingPhase2AnimationRight; // stuck here
+            } else if (jumpTimer < 0.3f) {
+                waffle_animation = jumpingPhase3AnimationRight;
+            } else {
+                waffle_animation = jumpingPhase4AnimationRight;
+            }
         }
         else if (!isRight && !isHitting){
-        waffle_animation = jumpingAnimationLeft;
-        isMoving = 1;
+            if (jumpTimer < 0.1f) {
+                waffle_animation = jumpingPhase1AnimationLeft;
+            } else if (jumpTimer < 0.2f) {
+                waffle_animation = jumpingPhase2AnimationLeft;
+            } else if (jumpTimer < 0.3f) {
+                waffle_animation = jumpingPhase3AnimationLeft;
+            } else {
+                waffle_animation = jumpingPhase4AnimationLeft;
+            }
         }
+
+        // Adjust jumpForce based on jump duration
+        if (jumpTimer < maxJumpDuration) {
+            jumpForce = -10 * (-1.0f + (jumpTimer / maxJumpDuration));
+        }
+    }
+
+        // Apply jump force
+        if (isJumping) {
+            wafflePos.y -= jumpForce;
+        }
+
+    // Check for release of the jump button
+    if (IsKeyReleased(KEY_UP) || jumpTimer >= maxJumpDuration) {
+        if (isRight){
+        waffle_animation = jumpingPhase3AnimationRight;
+        }
+        else{
+        waffle_animation = jumpingPhase3AnimationLeft;
+        }
+        jumpTimer = 0.0f;  // Reset the jump timer
+        jumpForce = 0.0f;  // Reset the jump force
     }
 
 
@@ -96,7 +132,7 @@ void Waffle::UpdateKeysAndAnimations(){
         isHissing = false;
     }
     
-    if (!isHissing && isRight){
+    if (!isHissing && isRight){ // its because when you hold down it 
     static bool sKeyDown = false; // Static variable to track the state of the s key
      if (IsKeyPressed(KEY_DOWN)) {
         isHitting = true;
@@ -136,7 +172,24 @@ void Waffle::UpdateKeysAndAnimations(){
     }
     }
     
-
+    if (isHitting){
+        if(isRight){
+            hittingHitbox = {
+            wafflePos.x+32, 
+            wafflePos.y, 
+            waffleSize, 
+            waffleSize
+        };
+        }
+    }
+    else{
+            hittingHitbox = {
+            wafflePos.x-32, 
+            wafflePos.y, 
+            waffleSize, 
+            waffleSize
+        };
+    }
     if (!isMoving && !isJumping && !isHissing && !isHitting){
         waffle_animation = idleAnimation; // this sets it to the idle if nothing else is pressed
     }
@@ -167,9 +220,6 @@ bool Waffle::lose(){
     return lost;
 }
 
-bool Waffle::win(){
-    return false; // fix this to let a win happen
-}
 
 Vector2 Waffle::setCameraTarget(){
     Vector2 target;
@@ -223,33 +273,6 @@ void Waffle::initializeAnimations(){
     };
     walkingBackwardAnimation = CreateSpriteAnimation(waffle, 8, walkingBackwardFrames, 8);
 
-
-    Rectangle jumpingRightFrames[] = {
-    (Rectangle){waffle_index * waffleSize, 256, waffleSize, waffleSize},
-    (Rectangle){waffle_index + 1 * waffleSize, 256, waffleSize, waffleSize},
-    (Rectangle){waffle_index + 2 * waffleSize, 256, waffleSize, waffleSize},
-    (Rectangle){waffle_index + 3 * waffleSize, 256, waffleSize, waffleSize},
-    (Rectangle){waffle_index + 4 * waffleSize, 256, waffleSize, waffleSize},
-    (Rectangle){waffle_index + 5 * waffleSize, 256, waffleSize, waffleSize},
-    (Rectangle){waffle_index + 6 * waffleSize, 256, waffleSize, waffleSize}
-
-    };
-    jumpingAnimationRight = CreateSpriteAnimation(waffle, 7, jumpingRightFrames, 7);
-
-
-    Rectangle jumpingLeftFrames[] = {
-    (Rectangle){waffle_index * waffleSize, 320, waffleSize, waffleSize},
-    (Rectangle){waffle_index + 1 * waffleSize, 320, waffleSize, waffleSize},
-    (Rectangle){waffle_index + 2 * waffleSize, 320, waffleSize, waffleSize},
-    (Rectangle){waffle_index + 3 * waffleSize, 320, waffleSize, waffleSize},
-    (Rectangle){waffle_index + 4 * waffleSize, 320, waffleSize, waffleSize},
-    (Rectangle){waffle_index + 5 * waffleSize, 320, waffleSize, waffleSize},
-    (Rectangle){waffle_index + 6 * waffleSize, 320, waffleSize, waffleSize}
-    };
-
-    jumpingAnimationLeft= CreateSpriteAnimation(waffle, 3, jumpingLeftFrames, 3);
-
-
     Rectangle hissingFrames[] = {
     (Rectangle){waffle_index * waffleSize, 288, waffleSize, waffleSize},
     (Rectangle){waffle_index + 1 * waffleSize, 288, waffleSize, waffleSize},
@@ -296,6 +319,67 @@ void Waffle::initializeAnimations(){
     };
 
     clawLeftAnimation = CreateSpriteAnimation(waffle, 6, clawLeftFrames, 6);
+
+    // Create the first phase of the jump animation for right-facing waffle
+    Rectangle jumpingPhase1FramesRight[] = {
+        (Rectangle){waffle_index * waffleSize, 256, waffleSize, waffleSize},
+        (Rectangle){waffle_index + 1 * waffleSize, 256, waffleSize, waffleSize}
+    };
+    jumpingPhase1AnimationRight = CreateSpriteAnimation(waffle, 2, jumpingPhase1FramesRight, 2);
+
+    // Create the second phase of the jump animation for right-facing waffle
+    Rectangle jumpingPhase2FramesRight[] = {
+        (Rectangle){waffle_index + 2 * waffleSize, 256, waffleSize, waffleSize},
+    };
+    jumpingPhase2AnimationRight = CreateSpriteAnimation(waffle, 1, jumpingPhase2FramesRight, 1);
+
+    // Create the third phase of the jump animation for right-facing waffle
+    Rectangle jumpingPhase3FramesRight[] = {
+        (Rectangle){waffle_index + 3 * waffleSize, 256, waffleSize, waffleSize},
+        (Rectangle){waffle_index + 4 * waffleSize, 256, waffleSize, waffleSize}
+    };
+    jumpingPhase3AnimationRight = CreateSpriteAnimation(waffle, 2, jumpingPhase3FramesRight, 2);
+
+    // Create the fourth phase of the jump animation for right-facing waffle
+    Rectangle jumpingPhase4FramesRight[] = {
+        (Rectangle){waffle_index + 5 * waffleSize, 256, waffleSize, waffleSize},
+        (Rectangle){waffle_index + 6 * waffleSize, 256, waffleSize, waffleSize}
+    };
+    jumpingPhase4AnimationRight = CreateSpriteAnimation(waffle, 2, jumpingPhase4FramesRight, 2);
+
+
+
+
+    // left
+
+    // Create the first phase of the jump animation for right-facing waffle
+    Rectangle jumpingPhase1FramesLeft[] = {
+        (Rectangle){waffle_index + 6 * waffleSize, 320, waffleSize, waffleSize},
+        (Rectangle){waffle_index + 5 * waffleSize, 320, waffleSize, waffleSize}
+    };
+    jumpingPhase1AnimationLeft= CreateSpriteAnimation(waffle, 2, jumpingPhase1FramesLeft, 2);
+
+    // Create the second phase of the jump animation for right-facing waffle
+    Rectangle jumpingPhase2FramesLeft[] = {
+        (Rectangle){waffle_index + 4 * waffleSize, 320, waffleSize, waffleSize}
+    };
+    jumpingPhase2AnimationLeft = CreateSpriteAnimation(waffle, 1, jumpingPhase2FramesLeft, 1);
+
+    // Create the third phase of the jump animation for right-facing waffle
+    Rectangle jumpingPhase3FramesLeft[] = {
+        (Rectangle){waffle_index + 3 * waffleSize, 320, waffleSize, waffleSize},
+        (Rectangle){waffle_index + 2 * waffleSize, 320, waffleSize, waffleSize}
+    };
+    jumpingPhase3AnimationLeft = CreateSpriteAnimation(waffle, 2, jumpingPhase3FramesLeft, 2);
+
+    // Create the fourth phase of the jump animation for right-facing waffle
+    Rectangle jumpingPhase4FramesLeft[] = {
+        (Rectangle){waffle_index + 1 * waffleSize, 320, waffleSize, waffleSize},
+        (Rectangle){waffle_index * waffleSize, 320, waffleSize, waffleSize}
+    };
+    jumpingPhase4AnimationLeft = CreateSpriteAnimation(waffle, 2, jumpingPhase4FramesLeft, 2);
+
+
 }
 void Waffle::initializeSounds(){
     hiss = LoadSound("Sounds/hissing.wav");

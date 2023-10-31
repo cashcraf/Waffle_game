@@ -85,7 +85,7 @@ int main() {
 
 
         else if (game) {
-            if (level1On) {
+            if (level1On && !level1Win) {
                 level1->updateGame();
                 level1->drawGame();
                 level1Restart = level1->checkLose();
@@ -99,6 +99,7 @@ int main() {
                     level1 = new Game(5, 1);
                     level1->initializeGame();
                     level1Restart = false;
+                    framesCounter = 0;
                     }
                     
                 }
@@ -109,6 +110,7 @@ int main() {
                     delete level1;
                     level2On = true;
                     level1On = false;
+                    CloseWindow();
                 }
             }
             // if (level2On){

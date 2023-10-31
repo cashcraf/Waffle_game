@@ -5,6 +5,8 @@ Game::Game(int numRats, int level) : waffle(Vector2{1, (float)screenHeight - 32}
     this->numRats = numRats;
     isWaffleHit.resize(numRats, false);
     ratDead.resize(numRats, false);
+    isWaffleHitting.resize(numRats, false);
+    isHitting = false;
 
     // camera
     camera = waffle.getWafflesCamera();
@@ -16,6 +18,7 @@ Game::Game(int numRats, int level) : waffle(Vector2{1, (float)screenHeight - 32}
 
 void Game::initializeGame() {
     game_restart = false;
+    win = false;
     waffle.initializeAnimations();
     rats.reserve(numRats);
 
@@ -31,9 +34,17 @@ void Game::initializeGame() {
     staminaSubtractJump = false;
     staminaSubtractHit = false;
 
+    // sprite drawing
     if (levelnum == 1) {
         background = LoadTexture("Images/2D_courtSt.png");
     }
+    winningTexture = LoadTexture("Images/winning.png"); // cant get data
+    Rectangle winningFrames[]{
+        (Rectangle){0, 0, 32, 32}
+    };
+    winningWaffle = CreateSpriteAnimation(winningTexture, 1, winningFrames, 1);
+    winningHitbox = (Rectangle){6950, (float)screenHeight - 100, 32*2, 32*4};
+
 
     // sound
     waffle.initializeSounds();
@@ -58,6 +69,25 @@ void Game::updateGame() {
             stamina -= 4;
         }
     }
+
+    isHitting = waffle.getIsHitting();
+    if (isHitting){
+    stamina -= 4;
+    Rectangle waffleHittingHitbox = waffle.getHittingHitbox();
+        for (int i = 0; i < numRats; i++) {
+            Rectangle rat1Hitbox2 = rats[i].getHitbox();
+            
+            if (!ratDead[i]){
+                isWaffleHitting[i] = CheckCollisionRecs(waffleHittingHitbox, rat1Hitbox2);
+            }
+            if (isWaffleHitting[i] && !ratDead[i]){
+                ratDead[i] = rats[i].Dead();
+                stamina += 20;
+            }
+        }
+    }
+
+    win = CheckCollisionRecs(waffleHitbox, winningHitbox);
 
     staminaSubtract = waffle.getIsMoving();
     staminaSubtractJump = waffle.getIsJumping();
@@ -89,6 +119,15 @@ void Game::drawGame() {
     
     DrawTexture(background, -(float)screenWidth / 6, 0, WHITE);
     DrawText("move waffle with arrow keys", 10, 10, 20, WHITE);
+
+
+    // draw winning sprite
+    Rectangle dest = (Rectangle){7000, (float)screenHeight - 100, 32*2, 32*2}; 
+    Vector2 origin = {0, 0};
+
+    DrawSpriteAnimationPro(winningWaffle, dest, origin, 0, WHITE);
+
+
     waffle.doAnimations();
     for (Rat& rat : rats) {
         rat.doAnimations();
@@ -108,12 +147,7 @@ bool Game::checkLose(){
 }
 
 bool Game::checkWin(){
-    if (waffle.win()){
-        return true;
-    }
-    if (!waffle.win()){
-        return false;
-    }
+    return win;
 }
 
 void Game::cleanUp() {
