@@ -33,6 +33,7 @@ void UpdatePhysics();
 
 void Update();
 bool Dead();
+void cleanUp();
 
 
 private:

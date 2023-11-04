@@ -42,6 +42,7 @@ public:
     void doAnimations();
     bool lose(); // loses the game and returns true
     void waffleWins();
+    void cleanUp();
 
 private:
     // animation values
@@ -71,7 +72,7 @@ private:
     const int screenHeight = 450;
 
     // camera values
-    Camera2D camera = InitiateCamera((Vector2){wafflePos.x + waffleSize * scale / 2, wafflePos.y + waffleSize * scale / 2}, (float)screenWidth, (float)screenHeight);
+    Camera2D camera; 
 
     // waffle postion values
     Rectangle hitbox;

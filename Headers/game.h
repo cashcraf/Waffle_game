@@ -9,6 +9,7 @@
 #include "waffle.h"
 #include "rat.h"
 
+
 class Game {
 public:
     Game(int numRats, int level);
