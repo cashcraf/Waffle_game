@@ -34,10 +34,18 @@ void Game::initializeGame() {
     staminaSubtractJump = false;
     staminaSubtractHit = false;
 
-    // sprite drawing
+    // level drawing
     if (levelnum == 1) {
         background = LoadTexture("Images/2D_courtSt.png");
     }
+    else if (levelnum == 2){
+        background = LoadTexture("Images/2D_college_green.png");
+    }
+    else if (levelnum == 3){
+        // make background the baker center
+    }
+
+    // sprite drawing
     winningTexture = LoadTexture("Images/winning.png"); // cant get data
     Rectangle winningFrames[]{
         (Rectangle){0, 0, 32, 32}
@@ -119,7 +127,7 @@ void Game::updateGame() {
 
 void Game::drawGame() {
     BeginMode2D(camera);
-    
+    ClearBackground(WHITE);
     DrawTexture(background, -(float)screenWidth / 6, 0, WHITE);
     DrawText("move waffle with arrow keys", 10, 10, 20, WHITE);
 
@@ -155,5 +163,9 @@ bool Game::checkWin(){
 
 void Game::cleanUp() {
     UnloadTexture(background);
+    for (int i = 0; i < numRats; i++) {
+        rats[i].cleanUp();
+    }
+    waffle.cleanUp();
 }
 

@@ -31,7 +31,7 @@
         hitbox = {ratPos.x, ratPos.y, ratSize-10, ratSize+10};
         }
         else {
-            ratPos = ratPos;
+            // do nothing
         }
     }
 
@@ -63,6 +63,10 @@ void Rat::doAnimations() {
         isDead = 1;
         //rat_animation = ratDie;
         return isDead;
+    }
+
+    void Rat::cleanUp(){
+        UnloadTexture(rat);
     }
 
     void Rat::initializeAnimations(){

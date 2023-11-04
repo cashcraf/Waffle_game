@@ -220,6 +220,17 @@ bool Waffle::lose(){
     return lost;
 }
 
+void Waffle::cleanUp() {
+    // Release any allocated resources here
+    UnloadSound(hiss);
+    UnloadSound(meow);
+    UnloadSound(claw);
+
+    // Release textures if you have any
+    UnloadTexture(waffle); // Replace `yourTexture` with the actual texture you want to release
+}
+
+
 void Waffle::waffleWins(){ // if waffle wins play the animation and win
     waffle_animation = winningAnimation; // need to do this
     win = true;
