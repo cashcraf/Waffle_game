@@ -6,13 +6,10 @@
 * 
 */
  
-// can now compile with make linux or make windows make clean to clear the executibles and make run to run on linux
-//#define PLATFORM_WEB
-#if defined(PLATFORM_WEB)
-#include <emscripten/emscripten.h>
-#else
+// can now compile with make linux or make windows or make web
+// make clean to clear the executibles and make run to run on linux or web
+
 #include "raylib.h"
-#endif
 #include <stdlib.h>
 #include "Headers/animation.h"
 #include "Headers/camera.h"
@@ -20,8 +17,13 @@
 #include "Headers/waffle.h"
 #include "Headers/game.h"
 
+#if defined(PLATFORM_WEB)
+#include <emscripten/emscripten.h>
+#endif
+
+
 // play web version with python3 -m http.server 
-// then go to http://localhost:8000/index.html
+// then go to http://localhost:8000/waffleWeb.html
 
 using namespace std;
 
@@ -60,6 +62,9 @@ using namespace std;
     Texture2D titlePic;
     Texture2D logoPic;;
 
+    // for web
+    //bool spaceBar = false;
+
 // For the web
 void UpdateDrawFrame(void);   
 
@@ -82,14 +87,17 @@ int main() {
 
 
 
-    // fps
-    SetTargetFPS(60);
-
     #ifdef PLATFORM_WEB
     emscripten_set_main_loop(UpdateDrawFrame, 0, 1);
 
     #else
-    
+
+    // fps
+    SetTargetFPS(60);
+
+    // audio
+    //InitAudioDevice();
+
     // Set up the game loop
     while (!WindowShouldClose()) {
         if (logo){
@@ -113,6 +121,7 @@ int main() {
         }
 
     else if (intro) {
+        BeginDrawing();
         ClearBackground(RAYWHITE);
 
         DrawTexture(titlePic, 0, 0, WHITE);
@@ -279,11 +288,13 @@ void UpdateDrawFrame() {
 
         DrawTexture(titlePic, 0, 0, WHITE);
         EndDrawing();
-
-        if (IsKeyPressed(KEY_SPACE)) {
+        
+    
+        if (IsKeyDown(KEY_SPACE)) {
             intro = false;
             game = true;
-        }
+            }
+        
     }
 
 
@@ -314,12 +325,12 @@ void UpdateDrawFrame() {
     
                 level1Win = level1->checkWin(); // checks if waffle has won
 
-                if (level1Win) {
+                if (level1Win) { // somewhere here it gives a devide by 0 
                     framesCounter++;
                     if (framesCounter >= 120) // wait 2 seconds then win the level
                     {
-                        level1->cleanUp();
-                        delete level1;
+                        level1->cleanUp(); 
+                        delete level1; 
                         level2On = true;
                         level1On = false;
                         framesCounter = 0;
@@ -330,7 +341,7 @@ void UpdateDrawFrame() {
 
             else if (level2On){
                 level2->updateGame();
-                level2->drawGame();
+                level2->drawGame(); // this is the issue
 
                 if (!level2Win){
                 level2Restart = level2->checkLose();
@@ -364,7 +375,7 @@ void UpdateDrawFrame() {
                     framesCounter = 0;
                     }
                 }
-            }
+             }
 
             else if (level3On){
                 level3->updateGame();

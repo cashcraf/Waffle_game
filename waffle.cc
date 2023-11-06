@@ -244,6 +244,7 @@ Vector2 Waffle::setCameraTarget(){
 }
 
 
+
 void Waffle::initializeAnimations(){
     Rectangle idolFrames[] = {
     (Rectangle){waffle_index * waffleSize, 0, waffleSize, waffleSize},

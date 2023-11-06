@@ -16,10 +16,12 @@ EMFLAGS = -O1
 # Source files
 SRC = waffle.cc animation.cc camera.cc rat.cc game.cc main.cc
 
+# Output directory
+OUTPUT_DIR = Builds
 # Output executables
-OUT_LINUX = waffle.exe
-OUT_WINDOWS = windows.exe
-OUT_HTML = waffleWeb.html
+OUT_LINUX = $(OUTPUT_DIR)/waffle.exe
+OUT_WINDOWS = $(OUTPUT_DIR)/windows.exe
+OUT_HTML = $(OUTPUT_DIR)/waffleWeb.html
 
 all: $(OUT_LINUX) $(OUT_WINDOWS)
 
@@ -32,7 +34,7 @@ $(OUT_WINDOWS): $(SRC)
 web: $(OUT_HTML)
 
 $(OUT_HTML): $(SRC)
-	$(EMCC) $(EMFLAGS) $^ -o $(OUT_HTML) $(LIBS_LINUX) $(LDFLAGSweb) -DPLATFORM_WEB -s USE_GLFW=3 -s USE_WEBGL2=1 --preload-file Sounds --preload-file Images --preload-file Headers -s ASYNCIFY --shell-file /home/cashcraf/raylib/src/shell.html
+	$(EMCC) $(EMFLAGS) $^ -o $(OUT_HTML) $(LIBS_LINUX) $(LDFLAGSweb) -DPLATFORM_WEB -s USE_GLFW=3 -s USE_WEBGL2=1 --preload-file Sounds --preload-file Images --preload-file Headers -s ASYNCIFY --shell-file /home/cashcraf/raylib/src/shell.html -s TOTAL_MEMORY=268435456
 
 .PHONY: run clean
 

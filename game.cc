@@ -47,10 +47,6 @@ void Game::initializeGame() {
 
     // sprite drawing
     winningTexture = LoadTexture("Images/winning.png"); // cant get data
-    Rectangle winningFrames[]{
-        (Rectangle){0, 0, 32, 32}
-    };
-    winningWaffle = CreateSpriteAnimation(winningTexture, 1, winningFrames, 1);
     winningHitbox = (Rectangle){6950, (float)screenHeight - 100, 32*2, 32*4};
 
 
@@ -132,11 +128,13 @@ void Game::drawGame() {
     DrawText("move waffle with arrow keys", 10, 10, 20, WHITE);
 
 
-    // draw winning sprite
+    // draw winning waffle
     Rectangle dest = (Rectangle){7000, (float)screenHeight - 100, 32*2, 32*2}; 
     Vector2 origin = {0, 0};
+    Rectangle source = { 0, 0, (float)winningTexture.width, (float)winningTexture.height };
 
-    DrawSpriteAnimationPro(winningWaffle, dest, origin, 0, WHITE);
+    DrawTexturePro(winningTexture, source, dest, origin, 0, WHITE);
+
 
 
     waffle.doAnimations();
@@ -160,6 +158,7 @@ bool Game::checkLose(){
 bool Game::checkWin(){
     return win;
 }
+
 
 void Game::cleanUp() {
     UnloadTexture(background);
