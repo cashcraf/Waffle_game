@@ -7,13 +7,10 @@
  
 #ifndef WAFFLE
 #define WAFFLE
-
-
 #include "raylib.h"
 #include <stdlib.h>
 #include "animation.h"
 #include "camera.h"
-using namespace std;
  
 class Waffle
 {

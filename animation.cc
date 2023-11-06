@@ -1,7 +1,12 @@
+/**
+*  @file: animation.cc
+*  @author: cashcraf
+*  @date: 2023-11-06 
+*  @brief: 
+*/
+ 
 #include "Headers/animation.h"
-#include <stdlib.h>
 
-// to compile: cc -o waffle.exe waffle.cc animation.cc -lraylib -lGL -lpthread -ldl -lrt -lX11 -lm
 SpriteAnimation CreateSpriteAnimation(Texture2D atlas, int framesPerSecond, Rectangle rectangles[], int Length){
     SpriteAnimation SpriteAnimation = 
     {

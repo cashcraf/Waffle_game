@@ -8,7 +8,7 @@
 #ifndef ANNIMATION_H_// name of class in all caps_H
 #define ANNIMATION_H_//name of class in all caps_H
 #include "raylib.h"
-//using namespace std;
+#include <stdlib.h>
  
 typedef struct SpriteAnimation
 {

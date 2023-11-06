@@ -1,3 +1,10 @@
+/**
+*  @file: game.cc
+*  @author: cashcraf
+*  @date: 2023-11-06 
+*  @brief: 
+*/
+
 #include "Headers/game.h"
 
 Game::Game(int numRats, int level) : waffle(Vector2{1, (float)screenHeight - 32}) { // this is passed a number of rats and then the level number

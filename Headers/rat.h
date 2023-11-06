@@ -8,11 +8,9 @@
 #ifndef RAT
 #define RAT
 #include "raylib.h"
+#include <stdlib.h>
 #include "animation.h"
 #include "camera.h"
-#include "waffle.h"
-
-using namespace std;
  
 class Rat
 {

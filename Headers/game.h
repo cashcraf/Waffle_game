@@ -1,6 +1,5 @@
 #ifndef GAME_H
 #define GAME_H
-
 #include <vector>
 #include <stdlib.h>
 #include "raylib.h"

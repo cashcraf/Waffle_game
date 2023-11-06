@@ -25,7 +25,6 @@
 // play web version with python3 -m http.server 
 // then go to http://localhost:8000/waffleWeb.html
 
-using namespace std;
 
    // Initialize Raylib and your game objects
     const int screenWidth = 800;

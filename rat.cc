@@ -5,13 +5,7 @@
     *  @brief: 
     */
      
-    #include "raylib.h"
-    #include <stdlib.h>
-    #include "Headers/animation.h"
-    #include "Headers/camera.h"
     #include "Headers/rat.h"
-    using namespace std;
-    // function defs here
 
     Rat::Rat(Vector2 startingPosition){
         ratPos = startingPosition; // initialize rat pos at its staring position
