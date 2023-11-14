@@ -8,7 +8,6 @@
 #ifndef WAFFLE
 #define WAFFLE
 #include "raylib.h"
-#include <stdlib.h>
 #include "animation.h"
 #include "camera.h"
  
@@ -33,9 +32,9 @@ public:
     bool getIsHitting(){return isHitting;}
 
     // updaters
-    void Update();
-    void UpdateKeysAndAnimations();
-    void UpdatePhysics();
+    void Update(bool hasCollided, bool collisionSideRight, bool collisionSideLeft);
+    void UpdateKeysAndAnimations(bool hasCollided, bool collisionSideRight, bool collisionSideLeft);
+    void UpdatePhysics(bool hasCollided);
     void doAnimations();
     bool lose(); // loses the game and returns true
     void waffleWins();
@@ -101,8 +100,13 @@ private:
 
     // Sound
     Sound meow;
-    Sound hiss;
-    Sound claw;
+    Sound hiss; // done
+    Sound claw; // done
+    Sound jump; // done
+    int framesToMeow = 0; // meows every 2 seconds
+    
+    bool collisionSideRightWaffle = false;
+    bool collisionSideLeftWaffle = false;
 
 
 };

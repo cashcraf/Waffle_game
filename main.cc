@@ -57,27 +57,41 @@
     bool level3Restart = false;
     bool level3Win = false;
 
+    bool winningScreenOn = false;
+
     // animation stuff
     Texture2D titlePic;
-    Texture2D logoPic;;
+    Texture2D logoPic; 
+
+    // Music music;
+    // bool musicPlaying = false;
 
     // for web
     //bool spaceBar = false;
 
 // For the web
-void UpdateDrawFrame(void);   
+  void UpdateDrawFrame(void); 
 
 int main() { 
     
     InitWindow(screenWidth, screenHeight, "Waffles Big Day OUt");
     InitAudioDevice();
-    level1 = new Game(5,1);
+    // scrap the music idea
+    // music = LoadMusicStream("Sounds/music.wav");
+
+    //  if (!musicPlaying) {
+    //     PlayMusicStream(music);
+    //     musicPlaying = true;
+    // }
+    //SetMusicVolume(music, 0.5f);
+
+    level1 = new Game(5, 5, 1);
     level1->initializeGame();
 
-    Game* level2 = new Game(5,2);
+    Game* level2 = new Game(5, 5, 2);
     level2->initializeGame();
 
-    Game* level3 = new Game(5,3);
+    Game* level3 = new Game(5, 5, 3);
     level3->initializeGame();
 
     // animation stuff
@@ -99,6 +113,7 @@ int main() {
 
     // Set up the game loop
     while (!WindowShouldClose()) {
+    
         if (logo){
         BeginDrawing();
         
@@ -132,7 +147,6 @@ int main() {
         }
     }
 
-
         else if (game) {
             if (level1On) {
                 level1->updateGame();
@@ -147,9 +161,10 @@ int main() {
                     if (framesCounter >= 120) // wait 2 seconds then reset the level
                     {
                     // Delete the existing level1 and create a new one
+                    
                     level1->cleanUp();
                     delete level1;
-                    level1 = new Game(5, 1);
+                    level1 = new Game(5, 5, 1);
                     level1->initializeGame();
                     level1Restart = false;
                     framesCounter = 0;
@@ -188,7 +203,7 @@ int main() {
                     {
                         // Delete the existing level1 and create a new one
                         delete level2;
-                        level2 = new Game(5, 2);
+                        level2 = new Game(5, 5, 2);
                         level2->initializeGame();
                         level2Restart = false;
                         framesCounter = 0;
@@ -226,7 +241,7 @@ int main() {
                     {
                         // Delete the existing level1 and create a new one
                         delete level3;
-                        level3 = new Game(5, 3);
+                        level3 = new Game(5, 5, 3);
                         level3->initializeGame();
                         level3Restart = false;
                         framesCounter = 0;
@@ -241,13 +256,24 @@ int main() {
                      framesCounter++;
                      if (framesCounter >= 120) // wait 2 seconds then win the level
                      {
-                    level2->cleanUp();
+                    level3->cleanUp();
                     delete level3;
-                    //level4On = true; // dont know if I want a level 4 or a winning screen or to quit yet
                     level3On = false;
+                    winningScreenOn = true; // dont know if I want a level 4 or a winning screen or to quit yet
                     framesCounter = 0;
                     }
                 }
+            }
+
+            else if (winningScreenOn){
+                BeginDrawing();
+
+                ClearBackground(RAYWHITE);
+
+                DrawText("Congrats, You Win!", screenWidth / 2 - MeasureText("Congrats, You Win!", 40) / 2, screenHeight / 2 - 40, 40, DARKGRAY);
+                DrawText("Push ESC to Quit", screenWidth / 2 - MeasureText("Push ESC to Quit", 20) / 2, screenHeight / 2 + 20, 20, GRAY);
+
+                EndDrawing();
             }
              
 
@@ -261,6 +287,7 @@ int main() {
 
 #ifdef PLATFORM_WEB
 // One iteration of main loop of my game for web
+
 void UpdateDrawFrame() {
         if (logo){
         BeginDrawing();
@@ -298,6 +325,7 @@ void UpdateDrawFrame() {
 
 
         else if (game) {
+            //UpdateMusicStream(music);
             if (level1On) {
                 level1->updateGame();
                 level1->drawGame();
@@ -313,7 +341,7 @@ void UpdateDrawFrame() {
                     // Delete the existing level1 and create a new one
                     level1->cleanUp();
                     delete level1;
-                    level1 = new Game(5, 1);
+                    level1 = new Game(5, 5, 1);
                     level1->initializeGame();
                     level1Restart = false;
                     framesCounter = 0;
@@ -351,8 +379,9 @@ void UpdateDrawFrame() {
                     if (framesCounter >= 120) // wait 2 seconds then reset the level
                     {
                         // Delete the existing level1 and create a new one
+                        level2->cleanUp();
                         delete level2;
-                        level2 = new Game(5, 2);
+                        level2 = new Game(5, 5, 2);
                         level2->initializeGame();
                         level2Restart = false;
                         framesCounter = 0;
@@ -389,8 +418,9 @@ void UpdateDrawFrame() {
                     if (framesCounter >= 120) // wait 2 seconds then reset the level
                     {
                         // Delete the existing level1 and create a new one
+                        level3->cleanUp();
                         delete level3;
-                        level3 = new Game(5, 3);
+                        level3 = new Game(5, 5, 3);
                         level3->initializeGame();
                         level3Restart = false;
                         framesCounter = 0;
@@ -405,13 +435,33 @@ void UpdateDrawFrame() {
                      framesCounter++;
                      if (framesCounter >= 120) // wait 2 seconds then win the level
                      {
-                    level2->cleanUp();
+                    level3->cleanUp();
                     delete level3;
-                    //level4On = true; // dont know if I want a level 4 or a winning screen or to quit yet
                     level3On = false;
+                    winningScreenOn = true; // dont know if I want a level 4 or a winning screen or to quit yet
                     framesCounter = 0;
+                    BeginDrawing();
+
+                    ClearBackground(RAYWHITE);
+
+                    DrawText("Congrats, You Win!", screenWidth / 2 - MeasureText("Congrats, You Win!", 40) / 2, screenHeight / 2 - 40, 40, DARKGRAY);
+                    DrawText("Push ESC to Quit", screenWidth / 2 - MeasureText("Push ESC to Quit", 20) / 2, screenHeight / 2 + 20, 20, GRAY);
+
+                    EndDrawing();
+            
                     }
                 }
+                
+                else if (winningScreenOn){
+                    BeginDrawing();
+
+                    ClearBackground(RAYWHITE);
+
+                    DrawText("Congrats, You Win!", screenWidth / 2 - MeasureText("Congrats, You Win!", 40) / 2, screenHeight / 2 - 40, 40, DARKGRAY);
+                    DrawText("Push ESC to Quit", screenWidth / 2 - MeasureText("Push ESC to Quit", 20) / 2, screenHeight / 2 + 20, 20, GRAY);
+
+                    EndDrawing();
+            }
             }
              
 

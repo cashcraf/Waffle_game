@@ -7,11 +7,13 @@
 #include "camera.h"
 #include "waffle.h"
 #include "rat.h"
+#include "owl.h"
+#include "game_objects.h"
 
 
 class Game {
 public:
-    Game(int numRats, int level);
+    Game(int numRats, int numOwls, int level);
     void initializeGame();
     void updateGame();
     void drawGame();
@@ -39,11 +41,15 @@ private:
     Color staminaBorderColor;
     Color staminaFillColor;
     int numRats;
+    int numOwls;
 
     // boolean values for enemy collisions
-    std::vector<bool> isWaffleHit;
+    std::vector<bool> isWaffleHitRat;
+    std::vector<bool> isWaffleHitOwl;
     std::vector<bool> ratDead;
-    std::vector<bool> isWaffleHitting;
+    std::vector<bool> owlDead;
+    std::vector<bool> isWaffleHittingRat;
+    std::vector<bool> isWaffleHittingOwl;
     bool isHitting;
     bool game_restart;
     Rectangle winningHitbox;
@@ -53,6 +59,21 @@ private:
     Camera2D camera;
     Waffle waffle;
     std::vector<Rat> rats;
+    std::vector<Owl> owls;
+
+
+    // game objects
+    GameObjects *game_objects;
+    bool waffleHasCollided = false;
+    std::vector<bool> ratHasCollided;
+    std::vector<bool> owlHasCollided;
+
+    bool collisionSideRightGame = false;
+    bool collisionSideLeftGame = false;
+
+    // sounds
+    Sound hurt = LoadSound("Sounds/hurt.wav");
+
 };
 
 #endif

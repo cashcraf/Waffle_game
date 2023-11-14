@@ -7,20 +7,29 @@
 
 #include "Headers/game.h"
 
-Game::Game(int numRats, int level) : waffle(Vector2{1, (float)screenHeight - 32}) { // this is passed a number of rats and then the level number
+Game::Game(int numRats, int numOwls, int level) : waffle(Vector2{1, (float)screenHeight - 32}) { // this is passed a number of rats and then the level number
+    game_objects = new GameObjects();
     levelnum = level;
     this->numRats = numRats;
-    isWaffleHit.resize(numRats, false);
+    this->numOwls = numOwls;
+    isWaffleHitRat.resize(numRats, false);
+    isWaffleHitOwl.resize(numOwls, false);
     ratDead.resize(numRats, false);
-    isWaffleHitting.resize(numRats, false);
+    owlDead.resize(numOwls, false);
+    isWaffleHittingRat.resize(numRats, false);
+    isWaffleHittingOwl.resize(numRats, false);
+    ratHasCollided.resize(numRats, false);
+    owlHasCollided.resize(numOwls, false);
+
     isHitting = false;
 
     // camera
     camera = waffle.getWafflesCamera();
 
     // stamina
-    stamina = 300;
+    stamina = 400; // reset to 400 or whatever you want 
     staminaBar = {camera.target.x + 10, camera.target.y + 10, stamina, 20};
+
 }
 
 void Game::initializeGame() {
@@ -28,12 +37,22 @@ void Game::initializeGame() {
     win = false;
     waffle.initializeAnimations();
     rats.reserve(numRats);
+    
+
 
     for (int i = 0; i < numRats; i++) {
-        Vector2 startingPosition = {(float)GetRandomValue(0, 10000), screenHeight - 32};
-        Rat rat(startingPosition);
+        Vector2 startingPositionRat = {(float)GetRandomValue(0, 10000), screenHeight - 32};
+        Rat rat(startingPositionRat);
         rat.initializeAnimations();
         rats.push_back(rat);
+    }
+
+    owls.reserve(numOwls);
+    for (int i = 0; i < numOwls; i++) {
+        Vector2 startingPositionOwl = {(float)GetRandomValue(0, 10000), (screenHeight +32)/2};
+        Owl owl(startingPositionOwl);
+        owl.initializeAnimations();
+        owls.push_back(owl);
     }
 
     // stamina
@@ -49,7 +68,7 @@ void Game::initializeGame() {
         background = LoadTexture("Images/2D_college_green.png");
     }
     else if (levelnum == 3){
-        // make background the baker center
+        background = LoadTexture("Images/2D_alden.png");
     }
 
     // sprite drawing
@@ -60,6 +79,9 @@ void Game::initializeGame() {
     // sound
     waffle.initializeSounds();
 
+    // game objects
+    game_objects->InitializeObjects(levelnum);
+
 }
 
 void Game::updateGame() {
@@ -69,14 +91,39 @@ void Game::updateGame() {
     }
     
     Rectangle waffleHitbox = waffle.getHitbox();
+    waffleHasCollided = game_objects->CheckCollisionWithObject(waffleHitbox, true);
     
     for (int i = 0; i < numRats; i++) {
-        Rectangle rat1Hitbox = rats[i].getHitbox();
+        Rectangle ratHitbox = rats[i].getHitbox();
+        if (ratHasCollided[i]){
+            ratHasCollided[i] = false;
+        }
+        ratHasCollided[i] = game_objects->CheckCollisionWithObject(ratHitbox, false);
+        
+
         
         if (!ratDead[i]){
-            isWaffleHit[i] = CheckCollisionRecs(waffleHitbox, rat1Hitbox);
+            isWaffleHitRat[i] = CheckCollisionRecs(waffleHitbox, ratHitbox);
         }
-        if (isWaffleHit[i] && !ratDead[i]){
+        if (isWaffleHitRat[i] && !ratDead[i]){
+            PlaySound(hurt);
+            stamina -= 4;
+        }
+    }
+
+     for (int i = 0; i < numOwls; i++) {
+        Rectangle owlHitbox = owls[i].getHitbox();
+        if (owlHasCollided[i]){
+            owlHasCollided[i] = false;
+        }
+        owlHasCollided[i] = game_objects->CheckCollisionWithObject(owlHitbox, false);
+
+        
+        if (!owlDead[i]){
+            isWaffleHitOwl[i] = CheckCollisionRecs(waffleHitbox, owlHitbox);
+        }
+        if (isWaffleHitOwl[i] && !owlDead[i]){
+            PlaySound(hurt);
             stamina -= 4;
         }
     }
@@ -86,14 +133,26 @@ void Game::updateGame() {
     stamina -= 4;
     Rectangle waffleHittingHitbox = waffle.getHittingHitbox();
         for (int i = 0; i < numRats; i++) {
-            Rectangle rat1Hitbox2 = rats[i].getHitbox();
+            Rectangle ratHitbox2 = rats[i].getHitbox();
             
             if (!ratDead[i]){
-                isWaffleHitting[i] = CheckCollisionRecs(waffleHittingHitbox, rat1Hitbox2);
+                isWaffleHittingRat[i] = CheckCollisionRecs(waffleHittingHitbox, ratHitbox2);
             }
-            if (isWaffleHitting[i] && !ratDead[i]){
+            if (isWaffleHittingRat[i] && !ratDead[i]){
                 ratDead[i] = rats[i].Dead();
-                stamina += 20;
+                stamina += 100;
+            }
+        }
+
+        for (int i = 0; i < numOwls; i++) {
+            Rectangle owlHitbox2 = owls[i].getHitbox();
+            
+            if (!owlDead[i]){
+                isWaffleHittingOwl[i] = CheckCollisionRecs(waffleHittingHitbox, owlHitbox2);
+            }
+            if (isWaffleHittingOwl[i] && !owlDead[i]){
+                owlDead[i] = owls[i].Dead();
+                stamina += 100;
             }
         }
     }
@@ -117,22 +176,41 @@ void Game::updateGame() {
     if (stamina <= 0) {
         game_restart = waffle.lose();
     }
-
-    waffle.Update();
     
-    for (Rat& rat : rats) {
-        rat.Update();
+    collisionSideRightGame = game_objects->getCollisionSideRight();
+    collisionSideLeftGame = game_objects->getCollisionSideLeft();
+    if (collisionSideRightGame){
+        stamina -= 0.1;
+    }
+
+    waffle.Update(waffleHasCollided, collisionSideRightGame, collisionSideLeftGame);
+    for (size_t i = 0; i < rats.size(); i++) {
+        rats[i].Update(ratHasCollided[i]);  
+    }
+
+    for (size_t i = 0; i < owls.size(); i++) {
+        owls[i].Update(owlHasCollided[i]);  // Using owlHasCollided indexed to correspond to the respective owl
     }
     
     staminaBar.x = camera.target.x - 100;
     staminaBar.y = camera.target.y - 400;
+    
 }
 
 void Game::drawGame() {
     BeginMode2D(camera);
     ClearBackground(WHITE);
     DrawTexture(background, -(float)screenWidth / 6, 0, WHITE);
-    DrawText("move waffle with arrow keys", 10, 10, 20, WHITE);
+    if (levelnum == 1){
+    DrawText("Level 1: Court St", 10, 10, 20, WHITE);
+    }
+    if (levelnum == 2){
+    DrawText("Level 2: College Green", 10, 10, 20, WHITE);
+    }
+        if (levelnum == 3){
+    DrawText("Level 3: Alden Library", 10, 10, 20, WHITE);
+    }
+    game_objects->DrawObjects();
 
 
     // draw winning waffle
@@ -148,8 +226,12 @@ void Game::drawGame() {
     for (Rat& rat : rats) {
         rat.doAnimations();
     }
+
+    for (Owl& owl : owls) {
+        owl.doAnimations();
+    }
     
-    float greenWidth = (stamina / 300.0f) * (staminaBar.width - 4);
+    float greenWidth = (stamina / 400.0f) * (staminaBar.width - 4);
     
     DrawRectangle(staminaBar.x, staminaBar.y, greenWidth, staminaBar.height - 4, LIME);
     DrawRectangleLinesEx(staminaBar, 5, BLACK);
@@ -172,6 +254,12 @@ void Game::cleanUp() {
     for (int i = 0; i < numRats; i++) {
         rats[i].cleanUp();
     }
+    for (int i = 0; i < numOwls; i++) {
+        owls[i].cleanUp();
+    }
     waffle.cleanUp();
+    UnloadSound(hurt);
+    game_objects->cleanUp();
+    delete game_objects;
 }
 

@@ -18,10 +18,12 @@ Waffle::Waffle(Vector2 wafflePosition){
     hitbox = {wafflePos.x, wafflePos.y, waffleSize-10, waffleSize+10};
 }
 
-void Waffle::Update(){
+void Waffle::Update(bool hasCollided, bool collisionSideRight, bool collisionSideLeft){
     if (!lost){
-    UpdateKeysAndAnimations();
-    UpdatePhysics();
+    collisionSideRightWaffle = collisionSideRight;
+    collisionSideLeftWaffle = collisionSideLeft;
+    UpdateKeysAndAnimations(hasCollided, collisionSideRightWaffle, collisionSideLeftWaffle);
+    UpdatePhysics(hasCollided);
     }
 }
 
@@ -35,19 +37,27 @@ void Waffle::doAnimations(){
         }
 }
 
-void Waffle::UpdateKeysAndAnimations(){ // jumping movement looks bad
+void Waffle::UpdateKeysAndAnimations(bool hasCollided, bool collisionSideRight, bool collisionSideLeft){ // jumping movement looks bad
+    framesToMeow ++;
+    if (framesToMeow == 400){ // meow every 4 seconds
+        PlaySound(meow);
+        framesToMeow = 0;
+    }
     // x direction
     if (!lost && !win){
-    if (IsKeyDown(KEY_RIGHT) && !isHissing) { // Dont need x bounds because its going to be a side scroller
+    if (IsKeyDown(KEY_RIGHT) && !isHissing && !collisionSideRight) { // Dont need x bounds because its going to be a side scroller
         wafflePos.x += x_velocity;
         isMoving = 1;
         isRight = 1;
         isLeft = 0;
         if (!isJumping && !isHitting){ // to account for when your in the air and pusing the right key
         waffle_animation = walkingForwardAnimation;
-        }
+        
     }
-    else if (IsKeyDown(KEY_LEFT) && wafflePos.x > 0 && !isHissing) { 
+    }
+
+    // y direction
+    else if (IsKeyDown(KEY_LEFT) && wafflePos.x > 0 && !isHissing && !collisionSideLeft) { 
         wafflePos.x -= x_velocity;
         isMoving = 1;
         isRight = 0;
@@ -62,6 +72,7 @@ void Waffle::UpdateKeysAndAnimations(){ // jumping movement looks bad
 
     // y direction
     if (IsKeyDown(KEY_UP) && canJump && !isHissing) {
+        PlaySound(jump);
         isJumping = true;
         canJump = 0; // no double jumps
         isMoving = 1;
@@ -102,6 +113,7 @@ void Waffle::UpdateKeysAndAnimations(){ // jumping movement looks bad
 
     // Check for release of the jump button
     if (IsKeyReleased(KEY_UP) || jumpTimer >= maxJumpDuration) {
+        StopSound(jump);
         if (isRight){
         waffle_animation = jumpingPhase3AnimationRight;
         }
@@ -201,7 +213,13 @@ void Waffle::UpdateKeysAndAnimations(){ // jumping movement looks bad
     }
 
 }
-void Waffle::UpdatePhysics(){
+void Waffle::UpdatePhysics(bool hasCollided){
+    if (hasCollided) {
+        y_velocity = 0;
+        isJumping = false;
+        canJump = true;
+    }
+    else {
     y_velocity += gravity; // apply gravity
     wafflePos.y += y_velocity; // update postion
     if (wafflePos.y > screenHeight - waffleSize) {
@@ -209,13 +227,13 @@ void Waffle::UpdatePhysics(){
         wafflePos.y = screenHeight - waffleSize;
         y_velocity = 0;
     hitbox = {wafflePos.x, wafflePos.y, waffleSize, waffleSize}; // update hitbox
-    
+    }
     }
 }
 bool Waffle::lose(){
     // lose makes waffle nap and not able to move
     lost = true;
-    UpdatePhysics();
+    UpdatePhysics(false);
     waffle_animation = nappingAnimation;
     return lost;
 }
@@ -225,6 +243,9 @@ void Waffle::cleanUp() {
     UnloadSound(hiss);
     UnloadSound(meow);
     UnloadSound(claw);
+    UnloadSound(jump);
+
+
 
     // Release textures if you have any
     UnloadTexture(waffle); // Replace `yourTexture` with the actual texture you want to release
@@ -234,7 +255,7 @@ void Waffle::cleanUp() {
 void Waffle::waffleWins(){ // if waffle wins play the animation and win
     waffle_animation = winningAnimation; // need to do this
     win = true;
-    UpdatePhysics();
+    UpdatePhysics(false);
 }
  
 Vector2 Waffle::setCameraTarget(){
@@ -309,7 +330,7 @@ void Waffle::initializeAnimations(){
     (Rectangle){waffle_index + 3 * waffleSize, 192, waffleSize, waffleSize},
     };
 
-    nappingAnimation = CreateSpriteAnimation(waffle, 3, nappingFrames, 3);
+    nappingAnimation = CreateSpriteAnimation(waffle, 4, nappingFrames, 4);
 
     Rectangle clawRightFrames[] = {
     (Rectangle){waffle_index * waffleSize, 224, waffleSize, waffleSize},
@@ -408,6 +429,8 @@ void Waffle::initializeAnimations(){
 }
 void Waffle::initializeSounds(){
     hiss = LoadSound("Sounds/hissing.wav");
-    meow = LoadSound("");
-    claw = LoadSound("");
+    meow = LoadSound("Sounds/meow.wav");
+    claw = LoadSound("Sounds/claw.wav");
+    jump = LoadSound("Sounds/jump.wav");
+
 }

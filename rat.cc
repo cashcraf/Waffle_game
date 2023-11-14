@@ -13,15 +13,31 @@
         isDead = 0;
 
     }
-    void Rat::Update(){
-        UpdatePhysics();
+    void Rat::Update(bool hasCollided){
+        UpdatePhysics(hasCollided);
     }
 
-    void Rat::UpdatePhysics(){
-        // to do
-        if (!isDead){
+    void Rat::UpdatePhysics(bool hasCollided){
+        // to do: add a if collision with any of the objects class and is left is already true isLeft = false
+        // but if collision with any of the objects class and is not left is left = true
+        if (hasCollided && isLeft){
+            isLeft = false;    
+        }
+        else if (hasCollided && !isLeft){
+            isLeft = true;
+        }
+    
+
+        if (!isDead && isLeft){
+        rat_animation = ratWalkLeft; // starts out alive and walking left
         float moveSpeed = 1.0;
         ratPos.x -= moveSpeed;
+        hitbox = {ratPos.x, ratPos.y, ratSize-10, ratSize+10};
+        }
+        else if (!isDead && !isLeft){
+        rat_animation = ratWalkRight;
+        float moveSpeed = 1.0;
+        ratPos.x += moveSpeed;
         hitbox = {ratPos.x, ratPos.y, ratSize-10, ratSize+10};
         }
         else {
@@ -64,7 +80,7 @@ void Rat::doAnimations() {
     }
 
     void Rat::initializeAnimations(){
-        Rectangle ratWalkFrames[] = {
+        Rectangle ratWalkLeftFrames[] = {
         (Rectangle){0, 0, ratSize, ratSize},
         (Rectangle){ 1 * ratSize, 0, ratSize, ratSize},
         (Rectangle){2 * ratSize, 0, ratSize, ratSize},
@@ -77,8 +93,7 @@ void Rat::doAnimations() {
         (Rectangle){9 * ratSize, 0, ratSize, ratSize}
 
         };
-        ratWalk = CreateSpriteAnimation(rat, 10, ratWalkFrames, 10);
-        rat_animation = ratWalk; // starts out alive and walking
+        ratWalkLeft = CreateSpriteAnimation(rat, 10, ratWalkLeftFrames, 10);
 
         // dying animations
         Rectangle ratDyingFrames[] = {
@@ -93,9 +108,24 @@ void Rat::doAnimations() {
 
 
         };
-        ratDie = CreateSpriteAnimation(rat, 10, ratDyingFrames, 10);
+        ratDie = CreateSpriteAnimation(rat, 8, ratDyingFrames, 8);
 
         Rectangle ratDeadFrame[] = { 7* ratSize, 32, ratSize, ratSize};
         ratDead = CreateSpriteAnimation(rat, 1, ratDeadFrame, 1);
+
+        Rectangle ratWalkRightFrames[] = {
+        (Rectangle){0, 64, ratSize, ratSize},
+        (Rectangle){ 1 * ratSize, 64, ratSize, ratSize},
+        (Rectangle){2 * ratSize, 64, ratSize, ratSize},
+        (Rectangle){3 * ratSize, 64, ratSize, ratSize},
+        (Rectangle){4 * ratSize, 64, ratSize, ratSize},  
+        (Rectangle){5 * ratSize, 64, ratSize, ratSize}, 
+        (Rectangle){6 * ratSize, 64, ratSize, ratSize},
+        (Rectangle){7 * ratSize, 64, ratSize, ratSize},
+        (Rectangle){8 * ratSize, 64, ratSize, ratSize},
+        (Rectangle){9 * ratSize, 64, ratSize, ratSize}
+
+        };
+        ratWalkRight = CreateSpriteAnimation(rat, 10, ratWalkRightFrames, 10);
 
     }

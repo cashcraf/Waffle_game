@@ -7,21 +7,21 @@ LDFLAGSweb = -I/home/cashcraf/raylib/src -I/home/cashcraf/emsdk/upstream/emscrip
 LIBS_LINUX = -lraylib -lGL -lpthread -ldl -lrt -lX11 -lm
 LIBS_WINDOWS = -lraylib -lopengl32 -lgdi32 -lwinmm -lpthread
 LIBS_WEB = -lraylib -lm
-OPT_FLAGS = -O1  # Adjust optimization level as needed
+OPT_FLAGS = -O0 # Adjust optimization level as needed
 
 # Emscripten tools and flags
 EMCC = emcc
-EMFLAGS = -O1
+EMFLAGS = -O0
 
 # Source files
-SRC = waffle.cc animation.cc camera.cc rat.cc game.cc main.cc
+SRC = waffle.cc animation.cc camera.cc rat.cc game.cc game_objects.cc owl.cc main.cc
 
 # Output directory
 OUTPUT_DIR = Builds
 # Output executables
 OUT_LINUX = $(OUTPUT_DIR)/waffle.exe
 OUT_WINDOWS = $(OUTPUT_DIR)/windows.exe
-OUT_HTML = $(OUTPUT_DIR)/waffleWeb.html
+OUT_HTML = $(OUTPUT_DIR)/index.html
 
 all: $(OUT_LINUX) $(OUT_WINDOWS)
 
@@ -34,7 +34,7 @@ $(OUT_WINDOWS): $(SRC)
 web: $(OUT_HTML)
 
 $(OUT_HTML): $(SRC)
-	$(EMCC) $(EMFLAGS) $^ -o $(OUT_HTML) $(LIBS_LINUX) $(LDFLAGSweb) -DPLATFORM_WEB -s USE_GLFW=3 -s USE_WEBGL2=1 --preload-file Sounds --preload-file Images --preload-file Headers -s ASYNCIFY --shell-file /home/cashcraf/raylib/src/shell.html -s TOTAL_MEMORY=268435456
+	$(EMCC) $(EMFLAGS) $^ -o $(OUT_HTML) $(LIBS_LINUX) $(LDFLAGSweb) -DPLATFORM_WEB -s USE_GLFW=3 -s USE_WEBGL2=1 --preload-file Sounds --preload-file Images --preload-file Headers --shell-file /home/cashcraf/raylib/src/shell.html -s INITIAL_MEMORY=67108864
 
 .PHONY: run clean
 
