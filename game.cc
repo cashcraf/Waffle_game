@@ -33,6 +33,7 @@ Game::Game(int numRats, int numOwls, int level) : waffle(Vector2{1, (float)scree
 }
 
 void Game::initializeGame() {
+    infiniteStamina = false;
     game_restart = false;
     win = false;
     waffle.initializeAnimations();
@@ -176,7 +177,12 @@ void Game::updateGame() {
     if (stamina <= 0) {
         game_restart = waffle.lose();
     }
-    
+
+    if (IsKeyPressed(KEY_S)){
+        stamina += 5000;    // "infinite" stamina mode!
+        infiniteStamina = true;      
+    }
+
     collisionSideRightGame = game_objects->getCollisionSideRight();
     collisionSideLeftGame = game_objects->getCollisionSideLeft();
     if (collisionSideRightGame){
@@ -201,6 +207,11 @@ void Game::drawGame() {
     BeginMode2D(camera);
     ClearBackground(WHITE);
     DrawTexture(background, -(float)screenWidth / 6, 0, WHITE);
+    if (infiniteStamina){
+        Vector2 wafflePos = waffle.getWafflePos();
+        DrawText("\"Infinite\" stamina mode activated!", wafflePos.x, 10, 30, GREEN);
+        
+    }
     if (levelnum == 1){
     DrawText("Level 1: Court St", 10, 10, 20, WHITE);
     }

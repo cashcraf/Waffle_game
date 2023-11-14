@@ -42,6 +42,7 @@ private:
     Color staminaFillColor;
     int numRats;
     int numOwls;
+    bool infiniteStamina;
 
     // boolean values for enemy collisions
     std::vector<bool> isWaffleHitRat;

@@ -23,7 +23,7 @@ OUT_LINUX = $(OUTPUT_DIR)/waffle.exe
 OUT_WINDOWS = $(OUTPUT_DIR)/windows.exe
 OUT_HTML = $(OUTPUT_DIR)/index.html
 
-all: $(OUT_LINUX) $(OUT_WINDOWS)
+all: $(OUT_LINUX) $(OUT_WINDOWS) $(OUT_HTML)
 
 $(OUT_LINUX): $(SRC)
 	$(CC) -o $(OUT_LINUX) $^ $(LIBS_LINUX) $(OPT_FLAGS)
